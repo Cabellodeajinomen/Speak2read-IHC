@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="s2r_background">#121212</color>
+    <color name="s2r_bubble_interlocutor">#2C2C2C</color>
+    <color name="s2r_bubble_usuario">#005088</color>
+    <color name="s2r_alert">#D32F2F</color>
+
+    <color name="s2r_text_primary">#FFFFFF</color>
+    <color name="s2r_text_on_bubble">#FFFFFF</color>
+</resources>

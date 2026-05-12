@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Speak2Read" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/s2r_background</item>
+        <item name="android:colorBackground">@color/s2r_background</item>
+        <item name="android:textColorPrimary">@color/s2r_text_primary</item>
+        <item name="android:textColor">@color/s2r_text_primary</item>
+    </style>
+</resources>

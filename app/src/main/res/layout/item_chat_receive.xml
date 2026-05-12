@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingVertical="4dp">
+
+    <TextView
+        android:id="@+id/tvMessageReceive"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="48dp"
+        android:background="@drawable/bg_chat_receive"
+        android:paddingHorizontal="14dp"
+        android:paddingVertical="10dp"
+        android:textColor="@color/s2r_text_primary"
+        android:textIsSelectable="true"
+        android:textSize="20sp" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/btnExpandReceive"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/expand_message"
+            android:padding="8dp"
+            android:src="@android:drawable/ic_menu_view"
+            android:tint="@color/s2r_text_primary" />
+
+        <ImageButton
+            android:id="@+id/btnSpeakReceive"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="4dp"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/speak_message"
+            android:padding="8dp"
+            android:src="@android:drawable/ic_lock_silent_mode_off"
+            android:tint="@color/s2r_text_primary" />
+    </LinearLayout>
+</LinearLayout>
+
