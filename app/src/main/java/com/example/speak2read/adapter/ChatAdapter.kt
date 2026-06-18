@@ -13,8 +13,7 @@ import com.example.speak2read.model.MessageType
 class ChatAdapter(
     private val messages: MutableList<ChatMessage> = mutableListOf(),
     private val onExpandMessage: (String) -> Unit,
-    private val onSpeakMessage: (String) -> Unit,
-    private val fontScale: Float = 1f
+    private val onSpeakMessage: (String) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -35,10 +34,10 @@ class ChatAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return if (viewType == VIEW_TYPE_RECEIVE) {
             val view = inflater.inflate(R.layout.item_chat_receive, parent, false)
-            ReceiveViewHolder(view, onExpandMessage, onSpeakMessage, fontScale)
+            ReceiveViewHolder(view, onExpandMessage, onSpeakMessage)
         } else {
             val view = inflater.inflate(R.layout.item_chat_send, parent, false)
-            SendViewHolder(view, onExpandMessage, onSpeakMessage, fontScale)
+            SendViewHolder(view, onExpandMessage, onSpeakMessage)
         }
     }
 
@@ -64,8 +63,7 @@ class ChatAdapter(
     class ReceiveViewHolder(
         itemView: View,
         private val onExpandMessage: (String) -> Unit,
-        private val onSpeakMessage: (String) -> Unit,
-        private val fontScale: Float
+        private val onSpeakMessage: (String) -> Unit
     ) : RecyclerView.ViewHolder(itemView) {
         private val tvMessage: TextView = itemView.findViewById(R.id.tvMessageReceive)
         private val btnExpand: ImageButton = itemView.findViewById(R.id.btnExpandReceive)
@@ -73,7 +71,6 @@ class ChatAdapter(
 
         fun bind(message: ChatMessage) {
             tvMessage.text = message.text
-            tvMessage.textSize = 20f * fontScale
             btnExpand.setOnClickListener { onExpandMessage(message.text) }
             btnSpeak.setOnClickListener { onSpeakMessage(message.text) }
         }
@@ -82,8 +79,7 @@ class ChatAdapter(
     class SendViewHolder(
         itemView: View,
         private val onExpandMessage: (String) -> Unit,
-        private val onSpeakMessage: (String) -> Unit,
-        private val fontScale: Float
+        private val onSpeakMessage: (String) -> Unit
     ) : RecyclerView.ViewHolder(itemView) {
         private val tvMessage: TextView = itemView.findViewById(R.id.tvMessageSend)
         private val btnExpand: ImageButton = itemView.findViewById(R.id.btnExpandSend)
@@ -91,7 +87,6 @@ class ChatAdapter(
 
         fun bind(message: ChatMessage) {
             tvMessage.text = message.text
-            tvMessage.textSize = 20f * fontScale
             btnExpand.setOnClickListener { onExpandMessage(message.text) }
             btnSpeak.setOnClickListener { onSpeakMessage(message.text) }
         }
