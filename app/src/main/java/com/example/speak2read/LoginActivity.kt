@@ -26,7 +26,6 @@ class LoginActivity : Activity() {
             val password = etPassword.text.toString()
 
             if (username == defaultUser && password == defaultPassword) {
-                Speak2ReadPrefs.setLoggedUser(this, username, "Usuario registrado")
                 startActivity(Intent(this, HomeActivity::class.java))
                 finish()
             } else {
@@ -39,7 +38,6 @@ class LoginActivity : Activity() {
         }
 
         btnGuest.setOnClickListener {
-            Speak2ReadPrefs.setLoggedUser(this, "Invitado", "Invitado")
             startActivity(Intent(this, HomeActivity::class.java))
             finish()
         }
