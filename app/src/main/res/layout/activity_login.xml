@@ -12,7 +12,7 @@
         android:layout_height="120dp"
         android:layout_marginBottom="16dp"
         android:contentDescription="@string/login_logo_desc"
-        android:src="@drawable/logo_speak2read"
+        android:src="@mipmap/ic_launcher"
         android:scaleType="centerInside" />
 
     <TextView
