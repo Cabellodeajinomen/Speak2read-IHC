@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 
     <application
         android:allowBackup="true"
@@ -34,13 +35,14 @@
             android:exported="false"
             android:theme="@style/Theme.Speak2Read" />
         <activity
-            android:name=".FullscreenTranscriptionActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Speak2Read" />
-        <activity
             android:name=".HomeActivity"
             android:exported="true"
             android:label="@string/app_name"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.Speak2Read" />
+        <activity
+            android:name=".FullscreenTranscriptionActivity"
+            android:exported="false"
             android:theme="@style/Theme.Speak2Read" />
     </application>
 
