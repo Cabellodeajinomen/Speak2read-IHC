@@ -10,37 +10,28 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.view.View
-import android.graphics.Color
 import android.view.animation.LinearInterpolator
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.ScrollView
-import android.widget.Toast
+import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.core.content.ContextCompat
 import com.example.speak2read.adapter.ChatAdapter
 import com.example.speak2read.model.ChatMessage
 import com.example.speak2read.model.MessageType
-import org.json.JSONArray
 import java.util.Locale
+import android.Manifest
+import android.content.pm.PackageManager
+import android.speech.RecognitionListener
+import android.speech.RecognizerIntent
+import android.speech.SpeechRecognizer
+import androidx.core.app.ActivityCompat
 
 class HomeActivity : Activity(), TextToSpeech.OnInitListener {
-
-    private val defaultQuickReplies = listOf(
-        "Sí, claro",
-        "No entiendo",
-        "Repita por favor",
-        "Hable más despacio",
-        "¿Me puede escribir eso?",
-        "Gracias",
-        "Un momento",
-        "Estoy listo/a"
-    )
-    private val quickReplyPrefs by lazy { getSharedPreferences("s2r_quick_replies", MODE_PRIVATE) }
 
     private lateinit var rvChat: RecyclerView
     private lateinit var adapter: ChatAdapter
@@ -51,15 +42,15 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
     private lateinit var btnFullscreenTranscription: ImageButton
     private lateinit var btnSendTranscription: ImageButton
     private lateinit var btnSendMessage: ImageButton
-    private lateinit var btnAcknowledge: Button
+    private lateinit var btnAcknowledge: android.widget.Button
     private lateinit var emergencyOverlay: View
     private lateinit var imgWarning: ImageView
-    private lateinit var quickReplyContainer: LinearLayout
-    private lateinit var mainContainer: View
 
     private var listening = false
     private var tts: TextToSpeech? = null
     private var micPulse: ObjectAnimator? = null
+    private var speechRecognizer: SpeechRecognizer? = null
+    private val REQUEST_RECORD_AUDIO = 100
 
     private val emergencyAction = "com.example.speak2read.ACTION_EMERGENCY"
     private var receiverRegistered = false
@@ -74,9 +65,11 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.setDecorFitsSystemWindows(true)
         setContentView(R.layout.activity_home)
 
         tts = TextToSpeech(this, this)
+        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
 
         rvChat = findViewById(R.id.recyclerChat)
         etMessage = findViewById(R.id.etMessage)
@@ -89,31 +82,129 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
         emergencyOverlay = findViewById(R.id.emergencyOverlay)
         btnAcknowledge = findViewById(R.id.btnAcknowledge)
         imgWarning = findViewById(R.id.imgWarning)
-        quickReplyContainer = findViewById(R.id.quickReplyContainer)
-        mainContainer = findViewById(R.id.mainContainer)
-
-        applyThemeAndFont()
-
+        configureSpeechRecognizer()
         adapter = ChatAdapter(
             onExpandMessage = { message -> showExpandedMessage(message) },
-            onSpeakMessage = { message -> speakText(message) },
-            fontScale = Speak2ReadPrefs.fontScale(this)
+            onSpeakMessage = { message -> speakText(message) }
         )
         rvChat.layoutManager = LinearLayoutManager(this)
         rvChat.adapter = adapter
 
-        renderQuickReplies()
+        // Quick replies
+        findViewById<View>(R.id.qr_si).setOnClickListener {
+            val text = findViewById<TextView>(R.id.tvQr1).text.toString()
+            sendQuickReply(text)
+        }
+        findViewById<View>(R.id.qr_no).setOnClickListener {
+            val text = findViewById<TextView>(R.id.tvQr2).text.toString()
+            sendQuickReply(text)
+        }
+        findViewById<View>(R.id.qr_repite).setOnClickListener {
+            val text = findViewById<TextView>(R.id.tvQr3).text.toString()
+            sendQuickReply(text)
+        }
+        findViewById<View>(R.id.qr_ayuda).setOnClickListener {
+            val text = findViewById<TextView>(R.id.tvQr4).text.toString()
+            sendQuickReply(text)
+        }
+
+        // Initial context load
+        updateQuickReplies(Speak2ReadPrefs.getCurrentContext(this))
+
 
         // Settings
         findViewById<ImageButton>(R.id.btnSettings).setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
 
+        findViewById<Button>(R.id.btnHospital)
+            .setOnClickListener {
+
+                Speak2ReadPrefs.setCurrentContext(
+                    this,
+                    "HOSPITAL"
+                )
+
+                updateQuickReplies("HOSPITAL")
+            }
+
+        findViewById<Button>(R.id.btnTransporte)
+            .setOnClickListener {
+
+                Speak2ReadPrefs.setCurrentContext(
+                    this,
+                    "TRANSPORTE"
+                )
+
+                updateQuickReplies("TRANSPORTE")
+            }
+
+        findViewById<Button>(R.id.btnCompras)
+            .setOnClickListener {
+
+                Speak2ReadPrefs.setCurrentContext(
+                    this,
+                    "COMPRAS"
+                )
+
+                updateQuickReplies("COMPRAS")
+            }
+
+        findViewById<Button>(R.id.btnEmergencia)
+            .setOnClickListener {
+
+                Speak2ReadPrefs.setCurrentContext(
+                    this,
+                    "EMERGENCIA"
+                )
+
+                updateQuickReplies("EMERGENCIA")
+            }
+
+        findViewById<Button>(R.id.btnPersonalizado)
+            .setOnClickListener {
+                Speak2ReadPrefs.setCurrentContext(this, "PERSONALIZADO")
+                updateQuickReplies("PERSONALIZADO")
+            }
         // Mic único para STT (simulado)
         btnMicTranscription.setOnClickListener {
-            listening = !listening
-            if (listening) startMicPulse() else stopMicPulse()
+
+            if (
+                ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.RECORD_AUDIO
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.RECORD_AUDIO),
+                    REQUEST_RECORD_AUDIO
+                )
+
+                return@setOnClickListener
+            }
+
+            startMicPulse()
+
+            val intent =
+                Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+
+            intent.putExtra(
+                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+            )
+
+            intent.putExtra(
+                RecognizerIntent.EXTRA_LANGUAGE,
+                "es-PE"
+            )
+
+            speechRecognizer?.startListening(intent)
+
+            listening = true
         }
+
 
         // Mic transcription button (simulado): agrega texto a transcription
         btnMicTranscription.setOnLongClickListener {
@@ -129,9 +220,16 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
         }
 
         btnSendTranscription.setOnClickListener {
+
             val text = etTranscription.text.toString().trim()
+
             if (text.isNotEmpty()) {
-                addMessage(text, MessageType.RECEIVE)
+
+                addMessage(
+                    text,
+                    MessageType.RECEIVE
+                )
+
                 etTranscription.text?.clear()
             }
         }
@@ -143,9 +241,18 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
         }
 
         btnSendMessage.setOnClickListener {
+
             val text = etMessage.text.toString().trim()
+
             if (text.isNotEmpty()) {
-                addMessage(text, MessageType.SEND)
+
+                addMessage(
+                    text,
+                    MessageType.SEND
+                )
+
+                speakText(text)
+
                 etMessage.text?.clear()
             }
         }
@@ -157,7 +264,77 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
         }
 
     }
+    private fun configureSpeechRecognizer() {
 
+        speechRecognizer?.setRecognitionListener(
+            object : RecognitionListener {
+
+                override fun onReadyForSpeech(params: Bundle?) {}
+
+                override fun onBeginningOfSpeech() {}
+
+                override fun onRmsChanged(rmsdB: Float) {}
+
+                override fun onBufferReceived(buffer: ByteArray?) {}
+
+                override fun onEndOfSpeech() {
+                    stopMicPulse()
+                    listening = false
+                }
+
+                override fun onError(error: Int) {
+
+                    stopMicPulse()
+                    listening = false
+
+                    android.widget.Toast.makeText(
+                        this@HomeActivity,
+                        "Error STT: $error",
+                        android.widget.Toast.LENGTH_LONG
+                    ).show()
+                }
+
+                override fun onResults(results: Bundle?) {
+
+                    val matches =
+                        results?.getStringArrayList(
+                            SpeechRecognizer.RESULTS_RECOGNITION
+                        )
+
+                    if (!matches.isNullOrEmpty()) {
+
+                        val recognizedText = matches[0]
+
+                        etTranscription.setText(recognizedText)
+                    }
+                }
+
+                override fun onPartialResults(partialResults: Bundle?) {}
+
+                override fun onEvent(eventType: Int, params: Bundle?) {}
+            }
+        )
+    }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(
+            requestCode,
+            permissions,
+            grantResults
+        )
+
+        if (
+            requestCode == REQUEST_RECORD_AUDIO &&
+            grantResults.isNotEmpty() &&
+            grantResults[0] == PackageManager.PERMISSION_GRANTED
+        ) {
+
+            btnMicTranscription.performClick()
+        }
+    }
     override fun onStart() {
         super.onStart()
         registerEmergencyReceiverIfNeeded()
@@ -166,155 +343,6 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
     override fun onStop() {
         unregisterEmergencyReceiverIfNeeded()
         super.onStop()
-    }
-
-    private fun insertQuickReply(text: String) {
-        etMessage.setText(text)
-    }
-
-    private fun applyThemeAndFont() {
-        val largeFont = Speak2ReadPrefs.fontScale(this)
-        etMessage.textSize = 20f * largeFont
-        etTranscription.textSize = 20f * largeFont
-        btnSpeaker.scaleX = 1f
-        btnSpeaker.scaleY = 1f
-
-        val background = if (Speak2ReadPrefs.isDarkTheme(this)) Color.parseColor("#121212") else Color.parseColor("#F5F5F5")
-        val textColor = if (Speak2ReadPrefs.isDarkTheme(this)) Color.WHITE else Color.parseColor("#121212")
-        mainContainer.setBackgroundColor(background)
-        rvChat.setBackgroundColor(background)
-        etMessage.setTextColor(textColor)
-        etMessage.setHintTextColor(textColor)
-        etTranscription.setTextColor(textColor)
-        etTranscription.setHintTextColor(textColor)
-    }
-
-    private fun renderQuickReplies() {
-        quickReplyContainer.removeAllViews()
-
-        getQuickReplies().forEach { reply ->
-            quickReplyContainer.addView(createQuickReplyButton(reply))
-        }
-
-        quickReplyContainer.addView(createManageQuickRepliesButton())
-    }
-
-    private fun getQuickReplies(): MutableList<String> {
-        val raw = quickReplyPrefs.getString("items", null) ?: return defaultQuickReplies.toMutableList()
-        val parsed = mutableListOf<String>()
-        try {
-            val array = JSONArray(raw)
-            for (i in 0 until array.length()) {
-                array.optString(i).trim().takeIf { it.isNotEmpty() }?.let(parsed::add)
-            }
-        } catch (_: Exception) {
-            return defaultQuickReplies.toMutableList()
-        }
-        return if (parsed.isEmpty()) defaultQuickReplies.toMutableList() else parsed
-    }
-
-    private fun saveQuickReplies(replies: List<String>) {
-        quickReplyPrefs.edit().putString("items", JSONArray(replies).toString()).apply()
-    }
-
-    private fun createQuickReplyButton(text: String): Button {
-        return Button(this).apply {
-            this.text = text
-            isAllCaps = false
-            textSize = 18f * Speak2ReadPrefs.fontScale(context)
-            setTextColor(if (Speak2ReadPrefs.isDarkTheme(context)) Color.WHITE else Color.BLACK)
-            setBackgroundResource(R.drawable.bg_quick_reply_card)
-            setPadding(32, 16, 32, 16)
-            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
-                marginEnd = 16
-            }
-            setOnClickListener { insertQuickReply(text) }
-            setOnLongClickListener {
-                speakText(text)
-                true
-            }
-        }
-    }
-
-    private fun createManageQuickRepliesButton(): Button {
-        return Button(this).apply {
-            text = getString(R.string.quick_reply_manage)
-            isAllCaps = false
-            textSize = 18f * Speak2ReadPrefs.fontScale(context)
-            setTextColor(if (Speak2ReadPrefs.isDarkTheme(context)) Color.WHITE else Color.BLACK)
-            setBackgroundResource(R.drawable.bg_quick_reply_card)
-            setPadding(32, 16, 32, 16)
-            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-            setOnClickListener { showQuickRepliesManager() }
-        }
-    }
-
-    private fun showQuickRepliesManager() {
-        val options = arrayOf(
-            getString(R.string.quick_reply_add_custom),
-            getString(R.string.quick_reply_reorder),
-            getString(R.string.quick_reply_restore_defaults)
-        )
-
-        AlertDialog.Builder(this)
-            .setTitle(getString(R.string.quick_reply_dialog_title))
-            .setItems(options) { _, which ->
-                when (which) {
-                    0 -> promptAddCustomQuickReply()
-                    1 -> promptReorderQuickReplies()
-                    2 -> {
-                        saveQuickReplies(defaultQuickReplies)
-                        renderQuickReplies()
-                    }
-                }
-            }
-            .setNegativeButton(getString(R.string.dialog_cancel), null)
-            .show()
-    }
-
-    private fun promptAddCustomQuickReply() {
-        val input = EditText(this).apply {
-            hint = getString(R.string.quick_reply_custom_hint)
-        }
-
-        AlertDialog.Builder(this)
-            .setTitle(getString(R.string.quick_reply_add_custom))
-            .setView(input)
-            .setPositiveButton(getString(R.string.dialog_accept)) { _, _ ->
-                val newText = input.text.toString().trim()
-                if (newText.isEmpty()) return@setPositiveButton
-
-                val current = getQuickReplies()
-                if (current.any { it.equals(newText, ignoreCase = true) }) {
-                    Toast.makeText(this, getString(R.string.quick_reply_duplicate), Toast.LENGTH_SHORT).show()
-                    return@setPositiveButton
-                }
-
-                current.add(newText)
-                saveQuickReplies(current)
-                renderQuickReplies()
-                Toast.makeText(this, getString(R.string.quick_reply_added), Toast.LENGTH_SHORT).show()
-            }
-            .setNegativeButton(getString(R.string.dialog_cancel), null)
-            .show()
-    }
-
-    private fun promptReorderQuickReplies() {
-        val current = getQuickReplies()
-        if (current.isEmpty()) return
-
-        AlertDialog.Builder(this)
-            .setTitle(getString(R.string.quick_reply_reorder))
-            .setItems(current.toTypedArray()) { _, which ->
-                if (which > 0) {
-                    val selected = current.removeAt(which)
-                    current.add(0, selected)
-                    saveQuickReplies(current)
-                    renderQuickReplies()
-                }
-            }
-            .setNegativeButton(getString(R.string.dialog_cancel), null)
-            .show()
     }
 
     private fun addMessage(text: String, type: MessageType) {
@@ -332,7 +360,11 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
 
     override fun onDestroy() {
         super.onDestroy()
+
         unregisterEmergencyReceiverIfNeeded()
+
+        speechRecognizer?.destroy()
+
         tts?.stop()
         tts?.shutdown()
     }
@@ -405,5 +437,67 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
     private fun stopWarningBlink() {
         imgWarning.alpha = 1f
     }
+
+    private fun sendQuickReply(text: String) {
+        etMessage.setText(text)
+        addMessage(text, MessageType.SEND)
+        speakText(text)
+        etMessage.text.clear()
+    }
+
+    private fun updateQuickReplies(context: String) {
+
+        val tvQr1 = findViewById<TextView>(R.id.tvQr1)
+        val tvQr2 = findViewById<TextView>(R.id.tvQr2)
+        val tvQr3 = findViewById<TextView>(R.id.tvQr3)
+        val tvQr4 = findViewById<TextView>(R.id.tvQr4)
+
+        when(context) {
+
+            "HOSPITAL" -> {
+                tvQr1.text = "Tengo una cita"
+                tvQr2.text = "Necesito ayuda"
+                tvQr3.text = "¿Dónde debo ir?"
+                tvQr4.text = "Repita por favor"
+            }
+
+            "TRANSPORTE" -> {
+                tvQr1.text = "¿Qué bus debo tomar?"
+                tvQr2.text = "¿Cuánto cuesta?"
+                tvQr3.text = "¿Dónde bajo?"
+                tvQr4.text = "Gracias"
+            }
+
+            "COMPRAS" -> {
+                tvQr1.text = "¿Cuánto cuesta?"
+                tvQr2.text = "Quiero comprar esto"
+                tvQr3.text = "¿Acepta tarjeta?"
+                tvQr4.text = "Gracias"
+            }
+
+            "EMERGENCIA" -> {
+                tvQr1.text = "Necesito ayuda"
+                tvQr2.text = "Llame a emergencias"
+                tvQr3.text = "Estoy perdido"
+                tvQr4.text = "Repita por favor"
+            }
+
+            "PERSONALIZADO" -> {
+                val custom = Speak2ReadPrefs.getCustomReplies(this)
+                tvQr1.text = custom[0]
+                tvQr2.text = custom[1]
+                tvQr3.text = custom[2]
+                tvQr4.text = custom[3]
+            }
+
+            else -> {
+                tvQr1.text = "Sí"
+                tvQr2.text = "No"
+                tvQr3.text = "Repita"
+                tvQr4.text = "Ayuda"
+            }
+        }
+    }
+
 }
 
