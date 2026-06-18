@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.Speak2Read" parent="android:Theme.Material.NoActionBar">
+    <style name="Theme.Speak2Read" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/s2r_bubble_usuario</item>
+        <item name="colorPrimaryVariant">@color/s2r_bubble_usuario</item>
+        <item name="colorOnPrimary">@color/white</item>
         <item name="android:windowBackground">@color/s2r_background</item>
         <item name="android:colorBackground">@color/s2r_background</item>
         <item name="android:textColorPrimary">@color/s2r_text_primary</item>
