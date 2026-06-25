@@ -4,35 +4,42 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Switch
+import android.widget.Toast
+import androidx.room.Room
+import com.example.speak2read.database.Speak2ReadDatabase
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class SettingsActivity : Activity() {
 
     private val prefsName = "s2r_settings"
     private lateinit var bottomNav: BottomNavigationView
+    private lateinit var database: Speak2ReadDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
         val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
+        database = Room.databaseBuilder(applicationContext, Speak2ReadDatabase::class.java, "speak2read_db")
+            .allowMainThreadQueries()
+            .fallbackToDestructiveMigration()
+            .build()
 
         val swFontSize = findViewById<Switch>(R.id.swFontSize)
         val swAlarmDetection = findViewById<Switch>(R.id.swAlarmDetection)
         val swTheme = findViewById<Switch>(R.id.swTheme)
-        val swLogout = findViewById<Switch>(R.id.swLogout)
 
+        // Initialize state
         swFontSize.isChecked = prefs.getBoolean("font_size_large", true)
         swAlarmDetection.isChecked = prefs.getBoolean("alarm_detection", true)
         swTheme.isChecked = prefs.getBoolean("dark_theme", true)
-        swLogout.isChecked = false
 
         swFontSize.setOnCheckedChangeListener { _, isChecked ->
             prefs.edit().putBoolean("font_size_large", isChecked).apply()
+            Toast.makeText(this, "El tamaño de fuente se aplicará al reiniciar", Toast.LENGTH_SHORT).show()
         }
 
         swAlarmDetection.setOnCheckedChangeListener { _, isChecked ->
@@ -41,16 +48,20 @@ class SettingsActivity : Activity() {
 
         swTheme.setOnCheckedChangeListener { _, isChecked ->
             prefs.edit().putBoolean("dark_theme", isChecked).apply()
+            Toast.makeText(this, "Reinicia la app para cambiar el tema", Toast.LENGTH_SHORT).show()
         }
 
-        swLogout.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                showLogoutDialog(swLogout)
-            }
-        }
-
-        findViewById<Button>(R.id.btnCustomReplies).setOnClickListener {
+        // Professional layout buttons
+        findViewById<LinearLayout>(R.id.btnCustomRepliesLayout).setOnClickListener {
             showCustomRepliesDialog()
+        }
+
+        findViewById<LinearLayout>(R.id.btnClearHistoryLayout).setOnClickListener {
+            showClearHistoryDialog()
+        }
+
+        findViewById<LinearLayout>(R.id.btnLogoutLayout).setOnClickListener {
+            showLogoutConfirmDialog()
         }
 
         bottomNav = findViewById(R.id.bottom_navigation)
@@ -85,7 +96,7 @@ class SettingsActivity : Activity() {
     private fun showCustomRepliesDialog() {
         val layout = LinearLayout(this)
         layout.orientation = LinearLayout.VERTICAL
-        layout.setPadding(40, 20, 40, 20)
+        layout.setPadding(60, 20, 60, 20)
 
         val custom = Speak2ReadPrefs.getCustomReplies(this)
 
@@ -110,12 +121,25 @@ class SettingsActivity : Activity() {
                     et3.text.toString(),
                     et4.text.toString()
                 )
+                Toast.makeText(this, "Respuestas guardadas", Toast.LENGTH_SHORT).show()
             }
             .setNegativeButton("Cancelar", null)
             .show()
     }
 
-    private fun showLogoutDialog(logoutSwitch: Switch) {
+    private fun showClearHistoryDialog() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.settings_clear_history)
+            .setMessage(R.string.settings_clear_history_confirm)
+            .setPositiveButton("Borrar") { _, _ ->
+                database.messageDao().clear()
+                Toast.makeText(this, "Historial borrado", Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun showLogoutConfirmDialog() {
         AlertDialog.Builder(this)
             .setTitle(getString(R.string.dialog_logout_title))
             .setMessage(getString(R.string.dialog_logout_message))
@@ -126,12 +150,7 @@ class SettingsActivity : Activity() {
                 startActivity(loginIntent)
                 finish()
             }
-            .setNegativeButton(getString(R.string.dialog_cancel)) { _, _ ->
-                logoutSwitch.isChecked = false
-            }
-            .setOnCancelListener {
-                logoutSwitch.isChecked = false
-            }
+            .setNegativeButton(getString(R.string.dialog_cancel), null)
             .show()
     }
 }

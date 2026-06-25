@@ -5,9 +5,18 @@
     android:layout_height="match_parent"
     android:background="@color/s2r_background">
 
+    <Toolbar
+        android:id="@+id/toolbarSettings"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:background="@color/s2r_background"
+        app:title="@string/settings_title"
+        app:titleTextColor="@color/s2r_text_primary" />
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/toolbarSettings"
         android:layout_above="@id/bottom_navigation">
 
         <LinearLayout
@@ -16,114 +25,226 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+            <!-- Category: General -->
             <TextView
-                android:id="@+id/tvSettingsTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/settings_title"
-                android:textColor="@color/s2r_text_primary"
-                android:textSize="24sp"
-                android:textStyle="bold" />
+                android:text="@string/settings_category_general"
+                android:textColor="@color/s2r_accent"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:layout_marginBottom="8dp"
+                android:layout_marginStart="4dp"/>
 
-            <LinearLayout
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:background="@drawable/bg_quick_reply_card"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="12dp">
+                app:cardBackgroundColor="@color/s2r_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                android:layout_marginBottom="24dp">
 
-                <TextView
-                    android:layout_width="0dp"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/switch_tamano_letra"
-                    android:textColor="@color/s2r_text_primary"
-                    android:textSize="16sp" />
+                    android:orientation="vertical">
 
-                <Switch
-                    android:id="@+id/swFontSize"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
+                    <!-- Font Size -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="16dp">
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@android:drawable/ic_menu_sort_alphabetically"
+                            app:tint="@color/s2r_text_secondary"/>
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="16dp"
+                            android:text="@string/switch_tamano_letra"
+                            android:textColor="@color/s2r_text_primary"
+                            android:textSize="16sp" />
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/swFontSize"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
 
-            <LinearLayout
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/s2r_background" android:layout_marginHorizontal="16dp"/>
+
+                    <!-- Dark Theme -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="16dp">
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@android:drawable/ic_menu_day"
+                            app:tint="@color/s2r_text_secondary"/>
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="16dp"
+                            android:text="@string/switch_cambiar_tema"
+                            android:textColor="@color/s2r_text_primary"
+                            android:textSize="16sp" />
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/swTheme"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/s2r_background" android:layout_marginHorizontal="16dp"/>
+
+                    <!-- Alarms -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="16dp">
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@android:drawable/ic_lock_silent_mode_off"
+                            app:tint="@color/s2r_text_secondary"/>
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="16dp"
+                            android:text="@string/switch_deteccion_alarmas"
+                            android:textColor="@color/s2r_text_primary"
+                            android:textSize="16sp" />
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/swAlarmDetection"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/s2r_background" android:layout_marginHorizontal="16dp"/>
+
+                    <!-- Custom Replies Button -->
+                    <LinearLayout
+                        android:id="@+id/btnCustomRepliesLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="16dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground">
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@android:drawable/ic_menu_edit"
+                            app:tint="@color/s2r_text_secondary"/>
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:text="Editar frases rápidas"
+                            android:textColor="@color/s2r_text_primary"
+                            android:textSize="16sp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Category: Account -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_category_account"
+                android:textColor="@color/s2r_accent"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:layout_marginBottom="8dp"
+                android:layout_marginStart="4dp"/>
+
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/bg_quick_reply_card"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="12dp">
+                app:cardBackgroundColor="@color/s2r_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                android:layout_marginBottom="24dp">
 
-                <TextView
-                    android:layout_width="0dp"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/switch_deteccion_alarmas"
-                    android:textColor="@color/s2r_text_primary"
-                    android:textSize="16sp" />
+                    android:orientation="vertical">
 
-                <Switch
-                    android:id="@+id/swAlarmDetection"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
+                    <!-- Clear History -->
+                    <LinearLayout
+                        android:id="@+id/btnClearHistoryLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="16dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground">
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@android:drawable/ic_menu_delete"
+                            app:tint="@color/s2r_text_secondary"/>
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:text="@string/settings_clear_history"
+                            android:textColor="@color/s2r_text_primary"
+                            android:textSize="16sp" />
+                    </LinearLayout>
 
-            <LinearLayout
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/s2r_background" android:layout_marginHorizontal="16dp"/>
+
+                    <!-- Logout -->
+                    <LinearLayout
+                        android:id="@+id/btnLogoutLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="16dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground">
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@android:drawable/ic_lock_power_off"
+                            app:tint="@color/s2r_alert"/>
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:text="@string/settings_logout_btn"
+                            android:textColor="@color/s2r_alert"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- About Section -->
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/bg_quick_reply_card"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="12dp">
+                android:gravity="center"
+                android:text="@string/settings_app_version"
+                android:textColor="@color/s2r_text_secondary"
+                android:textSize="12sp"
+                android:layout_marginTop="8dp"/>
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/switch_cambiar_tema"
-                    android:textColor="@color/s2r_text_primary"
-                    android:textSize="16sp" />
-
-                <Switch
-                    android:id="@+id/swTheme"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/bg_quick_reply_card"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="12dp">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/switch_cerrar_sesion"
-                    android:textColor="@color/s2r_alert"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-
-                <Switch
-                    android:id="@+id/swLogout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
-
-            <Button
-                android:id="@+id/btnCustomReplies"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="Editar respuestas personalizadas" />
         </LinearLayout>
     </ScrollView>
 
@@ -135,6 +256,7 @@
         android:background="@color/s2r_surface"
         app:itemIconTint="@color/s2r_text_secondary"
         app:itemTextColor="@color/s2r_text_secondary"
+        app:labelVisibilityMode="labeled"
         app:menu="@menu/bottom_nav_menu" />
 
 </RelativeLayout>

@@ -58,4 +58,13 @@
     <string name="empty_chats_desc">Aquí aparecerán tus conversaciones guardadas próximamente.</string>
     <string name="slogan_login">Comunicación sin barreras</string>
     <string name="btn_close">Cerrar</string>
+
+    <!-- Settings New Strings -->
+    <string name="settings_category_general">General</string>
+    <string name="settings_category_account">Cuenta</string>
+    <string name="settings_category_about">Información</string>
+    <string name="settings_clear_history">Borrar historial de chat</string>
+    <string name="settings_clear_history_confirm">¿Estás seguro de que quieres borrar todos los mensajes? Esta acción no se puede deshacer.</string>
+    <string name="settings_app_version">Versión 1.0.4 - Pro</string>
+    <string name="settings_logout_btn">Cerrar Sesión</string>
 </resources>
