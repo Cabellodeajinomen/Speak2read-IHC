@@ -9,5 +9,6 @@ data class ChatMessageEntity(
     val id: Int = 0,
     val text: String,
     val type: String,
+    val timestamp: String,
     val isFavorite: Boolean = false
 )

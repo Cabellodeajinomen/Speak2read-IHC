@@ -20,7 +20,7 @@ import java.util.Locale
 class FavoritesActivity : Activity(), TextToSpeech.OnInitListener {
 
     private lateinit var rvFavorites: RecyclerView
-    private lateinit var emptyState: android.widget.LinearLayout
+    private lateinit var emptyState: LinearLayout
     private lateinit var adapter: ChatAdapter
     private lateinit var bottomNav: BottomNavigationView
     private lateinit var database: Speak2ReadDatabase
@@ -57,12 +57,6 @@ class FavoritesActivity : Activity(), TextToSpeech.OnInitListener {
         setupBottomNavigation()
     }
 
-    private fun showExpandedMessage(message: String) {
-        val intent = Intent(this, FullscreenTranscriptionActivity::class.java)
-        intent.putExtra("text", message)
-        startActivity(intent)
-    }
-
     private fun setupBottomNavigation() {
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
@@ -93,6 +87,7 @@ class FavoritesActivity : Activity(), TextToSpeech.OnInitListener {
                 id = it.id,
                 text = it.text,
                 type = if (it.type == "SEND") MessageType.SEND else MessageType.RECEIVE,
+                timestamp = it.timestamp,
                 isFavorite = it.isFavorite
             )
         }
@@ -110,9 +105,15 @@ class FavoritesActivity : Activity(), TextToSpeech.OnInitListener {
     private fun toggleFavorite(message: ChatMessage) {
         val newStatus = !message.isFavorite
         database.messageDao().updateFavorite(message.id, newStatus)
-        loadFavorites() // Refresh list
+        loadFavorites()
         val msg = if (newStatus) "Agregado a favoritos" else "Quitado de favoritos"
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun showExpandedMessage(message: String) {
+        val intent = Intent(this, FullscreenTranscriptionActivity::class.java)
+        intent.putExtra("text", message)
+        startActivity(intent)
     }
 
     private fun speakText(text: String) {

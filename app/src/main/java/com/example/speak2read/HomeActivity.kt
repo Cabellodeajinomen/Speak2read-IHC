@@ -35,6 +35,8 @@ import androidx.room.Room
 import com.example.speak2read.database.ChatMessageEntity
 import com.example.speak2read.database.Speak2ReadDatabase
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import java.text.SimpleDateFormat
+import java.util.Date
 
 class HomeActivity : Activity(), TextToSpeech.OnInitListener {
 
@@ -98,7 +100,7 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
             "speak2read_db"
         )
             .allowMainThreadQueries()
-            .fallbackToDestructiveMigration() // Added for the schema change (isFavorite)
+            .fallbackToDestructiveMigration()
             .build()
 
         configureSpeechRecognizer()
@@ -219,7 +221,7 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
                 }
                 R.id.nav_settings -> {
                     startActivity(Intent(this, SettingsActivity::class.java))
-                    false // Don't select it as it opens a new activity
+                    false 
                 }
                 else -> false
             }
@@ -295,9 +297,10 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
     }
 
     private fun addMessage(text: String, type: MessageType) {
-        val entity = ChatMessageEntity(text = text, type = type.name)
+        val time = SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date())
+        val entity = ChatMessageEntity(text = text, type = type.name, timestamp = time)
         val id = database.messageDao().insert(entity).toInt()
-        adapter.addMessage(ChatMessage(id = id, text = text, type = type))
+        adapter.addMessage(ChatMessage(id = id, text = text, type = type, timestamp = time))
         rvChat.scrollToPosition(adapter.itemCount - 1)
     }
 
@@ -308,6 +311,7 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
                 id = it.id,
                 text = it.text,
                 type = if (it.type == "SEND") MessageType.SEND else MessageType.RECEIVE,
+                timestamp = it.timestamp,
                 isFavorite = it.isFavorite
             )
         }

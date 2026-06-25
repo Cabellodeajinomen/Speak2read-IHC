@@ -33,14 +33,18 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnSosHeader"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="40dp"
                     android:text="@string/label_sos"
                     android:textColor="@color/s2r_alert"
                     android:textStyle="bold"
+                    android:paddingHorizontal="12dp"
                     app:icon="@android:drawable/ic_dialog_alert"
                     app:iconTint="@color/s2r_alert"
+                    app:strokeColor="@color/s2r_alert"
+                    app:strokeWidth="1.5dp"
+                    app:cornerRadius="20dp"
                     app:rippleColor="#20FF5252" />
 
                 <ImageButton
@@ -245,16 +249,6 @@
             android:paddingBottom="8dp"
             android:background="@color/s2r_background">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/sender_me"
-                android:textColor="@color/s2r_text_primary"
-                android:textStyle="bold"
-                android:textSize="12sp"
-                android:textAllCaps="true"
-                android:alpha="0.7"/>
-
             <androidx.gridlayout.widget.GridLayout
                 android:id="@+id/quickReplyGrid"
                 android:layout_width="match_parent"
@@ -405,6 +399,7 @@
         android:background="@color/s2r_surface"
         app:itemIconTint="@color/s2r_text_secondary"
         app:itemTextColor="@color/s2r_text_secondary"
+        app:labelVisibilityMode="labeled"
         app:menu="@menu/bottom_nav_menu" />
 
     <!-- Emergency Overlay -->

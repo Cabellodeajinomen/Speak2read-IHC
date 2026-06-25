@@ -5,7 +5,7 @@ import androidx.room.RoomDatabase
 
 @Database(
     entities = [ChatMessageEntity::class],
-    version = 2
+    version = 3
 )
 abstract class Speak2ReadDatabase : RoomDatabase() {
     abstract fun messageDao(): MessageDao

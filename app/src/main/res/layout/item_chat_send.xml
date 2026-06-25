@@ -14,7 +14,7 @@
         android:id="@+id/tvMessageSend"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:maxWidth="280dp"
+        android:maxWidth="320dp"
         android:background="@drawable/bg_chat_send"
         android:paddingHorizontal="16dp"
         android:paddingVertical="12dp"
@@ -25,23 +25,11 @@
         android:elevation="1dp"/>
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginTop="4dp"
-        android:layout_marginEnd="4dp"
-        android:alpha="0.6">
-
-        <ImageButton
-            android:id="@+id/btnSpeakSend"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/speak_message"
-            android:src="@android:drawable/ic_lock_silent_mode_off"
-            app:tint="@color/s2r_text_secondary"
-            android:padding="6dp"
-            android:scaleType="fitCenter"/>
+        android:gravity="center_vertical">
 
         <ImageButton
             android:id="@+id/btnFavoriteSend"
@@ -52,7 +40,8 @@
             android:src="@android:drawable/btn_star_big_off"
             app:tint="@color/s2r_text_secondary"
             android:padding="6dp"
-            android:scaleType="fitCenter" />
+            android:scaleType="fitCenter"
+            android:alpha="0.6"/>
 
         <ImageButton
             android:id="@+id/btnExpandSend"
@@ -63,6 +52,34 @@
             android:src="@android:drawable/ic_menu_zoom"
             app:tint="@color/s2r_text_secondary"
             android:padding="6dp"
-            android:scaleType="fitCenter" />
+            android:scaleType="fitCenter"
+            android:alpha="0.6"/>
+
+        <ImageButton
+            android:id="@+id/btnSpeakSend"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/speak_message"
+            android:src="@android:drawable/ic_lock_silent_mode_off"
+            app:tint="@color/s2r_text_secondary"
+            android:padding="6dp"
+            android:scaleType="fitCenter"
+            android:alpha="0.6"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"/>
+
+        <TextView
+            android:id="@+id/tvTimeSend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="8:00 PM"
+            android:textSize="11sp"
+            android:textColor="@color/s2r_text_secondary"
+            android:alpha="0.6"
+            android:layout_marginEnd="4dp"/>
     </LinearLayout>
 </LinearLayout>
