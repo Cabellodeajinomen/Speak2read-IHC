@@ -43,10 +43,18 @@
     <string name="label_historial">HISTORIAL</string>
     <string name="label_mi_respuesta">MI RESPUESTA</string>
     <string name="fab_ayuda">🚨 AYUDA</string>
+    <string name="label_sos">SOS</string>
     <string name="nav_home">Inicio</string>
     <string name="nav_chats">Chats</string>
     <string name="nav_favorites">Favoritos</string>
     <string name="nav_settings">Ajustes</string>
     <string name="sender_interlocutor">👂 Interlocutor</string>
     <string name="sender_me">🧏 Tú</string>
+    <string name="title_conversations">Mis Conversaciones</string>
+    <string name="title_favorites">Mis Favoritos</string>
+    <string name="empty_favorites_title">No tienes favoritos aún</string>
+    <string name="empty_favorites_desc">Pulsa la estrella en cualquier mensaje para guardarlo aquí.</string>
+    <string name="empty_chats_title">Historial de Chats</string>
+    <string name="empty_chats_desc">Aquí aparecerán tus conversaciones guardadas próximamente.</string>
+    <string name="slogan_login">Comunicación sin barreras</string>
 </resources>

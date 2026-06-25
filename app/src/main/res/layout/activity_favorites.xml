@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:background="@color/s2r_background"
-        app:title="Mis Favoritos"
+        app:title="@string/title_favorites"
         app:titleTextColor="@color/s2r_text_primary" />
 
     <LinearLayout
@@ -30,13 +30,14 @@
             android:layout_height="120dp"
             android:src="@android:drawable/btn_star_big_on"
             app:tint="@color/s2r_surface"
-            android:alpha="0.5" />
+            android:alpha="0.5"
+            android:contentDescription="@string/empty_favorites_title" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="No tienes favoritos aún"
+            android:text="@string/empty_favorites_title"
             android:textColor="@color/s2r_text_primary"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -46,7 +47,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:gravity="center"
-            android:text="Pulsa la estrella en cualquier mensaje para guardarlo aquí."
+            android:text="@string/empty_favorites_desc"
             android:textColor="@color/s2r_text_secondary"
             android:textSize="14sp" />
     </LinearLayout>

@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:background="@color/s2r_background"
-        app:title="Mis Conversaciones"
+        app:title="@string/title_conversations"
         app:titleTextColor="@color/s2r_text_primary" />
 
     <LinearLayout
@@ -26,14 +26,15 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:src="@android:drawable/ic_menu_send"
-            app:tint="@color/s2r_text_secondary"
-            android:alpha="0.3"/>
+            app:tint="@color/s2r_surface"
+            android:alpha="0.3"
+            android:contentDescription="@string/empty_chats_title"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Historial de Chats"
+            android:text="@string/empty_chats_title"
             android:textColor="@color/s2r_text_primary"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -43,7 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:gravity="center"
-            android:text="Aquí aparecerán tus conversaciones guardadas próximamente."
+            android:text="@string/empty_chats_desc"
             android:textColor="@color/s2r_text_secondary"
             android:textSize="14sp" />
     </LinearLayout>

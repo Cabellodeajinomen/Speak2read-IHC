@@ -36,7 +36,7 @@
                     style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="SOS"
+                    android:text="@string/label_sos"
                     android:textColor="@color/s2r_alert"
                     android:textStyle="bold"
                     app:icon="@android:drawable/ic_dialog_alert"
