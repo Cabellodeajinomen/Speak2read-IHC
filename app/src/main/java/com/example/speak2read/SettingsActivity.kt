@@ -6,11 +6,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.EditText
 import android.widget.LinearLayout
-import android.widget.Switch
 import android.widget.Toast
 import androidx.room.Room
 import com.example.speak2read.database.Speak2ReadDatabase
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.switchmaterial.SwitchMaterial
 
 class SettingsActivity : Activity() {
 
@@ -28,9 +28,9 @@ class SettingsActivity : Activity() {
             .fallbackToDestructiveMigration()
             .build()
 
-        val swFontSize = findViewById<Switch>(R.id.swFontSize)
-        val swAlarmDetection = findViewById<Switch>(R.id.swAlarmDetection)
-        val swTheme = findViewById<Switch>(R.id.swTheme)
+        val swFontSize = findViewById<SwitchMaterial>(R.id.swFontSize)
+        val swAlarmDetection = findViewById<SwitchMaterial>(R.id.swAlarmDetection)
+        val swTheme = findViewById<SwitchMaterial>(R.id.swTheme)
 
         // Initialize state
         swFontSize.isChecked = prefs.getBoolean("font_size_large", true)
