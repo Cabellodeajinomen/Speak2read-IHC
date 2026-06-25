@@ -18,7 +18,7 @@
         android:paddingVertical="10dp"
         android:textColor="@color/s2r_text_primary"
         android:textIsSelectable="true"
-        android:textSize="20sp" />
+        android:textSize="16sp" />
 
     <LinearLayout
         android:layout_width="wrap_content"

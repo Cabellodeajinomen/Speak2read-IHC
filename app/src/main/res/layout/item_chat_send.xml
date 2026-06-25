@@ -42,6 +42,6 @@
         android:paddingVertical="10dp"
         android:textColor="@color/s2r_text_primary"
         android:textIsSelectable="true"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:gravity="end" />
 </LinearLayout>

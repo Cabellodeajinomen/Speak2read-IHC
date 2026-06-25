@@ -34,7 +34,7 @@
                 android:layout_weight="1"
                 android:text="@string/switch_tamano_letra"
                 android:textColor="@color/s2r_text_primary"
-                android:textSize="20sp" />
+                android:textSize="16sp" />
 
             <Switch
                 android:id="@+id/swFontSize"
@@ -57,7 +57,7 @@
                 android:layout_weight="1"
                 android:text="@string/switch_deteccion_alarmas"
                 android:textColor="@color/s2r_text_primary"
-                android:textSize="20sp" />
+                android:textSize="16sp" />
 
             <Switch
                 android:id="@+id/swAlarmDetection"
@@ -80,7 +80,7 @@
                 android:layout_weight="1"
                 android:text="@string/switch_cambiar_tema"
                 android:textColor="@color/s2r_text_primary"
-                android:textSize="20sp" />
+                android:textSize="16sp" />
 
             <Switch
                 android:id="@+id/swTheme"
@@ -103,7 +103,7 @@
                 android:layout_weight="1"
                 android:text="@string/switch_cerrar_sesion"
                 android:textColor="@color/s2r_alert"
-                android:textSize="20sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <Switch

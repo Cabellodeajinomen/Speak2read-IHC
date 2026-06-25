@@ -2,13 +2,12 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-
-    <color name="s2r_background">#121212</color>
-    <color name="s2r_card">#1E1E1E</color>
-    <color name="s2r_input">#252525</color>
-    <color name="s2r_secondary">#BDBDBD</color>
-    <color name="s2r_bubble_interlocutor">#2C2C2C</color>
-    <color name="s2r_bubble_usuario">#2563EB</color>
-    <color name="s2r_alert">#D32F2F</color>
+    <color name="s2r_background">#1B1D22</color>
+    <color name="s2r_surface">#252932</color>
+    <color name="s2r_bubble_interlocutor">#313642</color>
+    <color name="s2r_bubble_usuario">#4F8CFF</color>
+    <color name="s2r_accent">#7CB4FF</color>
+    <color name="s2r_alert">#FF5252</color>
     <color name="s2r_text_primary">#FFFFFF</color>
+    <color name="s2r_text_secondary">#B8BEC9</color>
 </resources>

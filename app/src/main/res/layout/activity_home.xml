@@ -224,7 +224,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="6dp"
-                        app:cardBackgroundColor="@color/s2r_card"
+                        app:cardBackgroundColor="@color/s2r_surface"
                         app:cardCornerRadius="24dp"
                         app:strokeColor="#3B82F6"
                         app:strokeWidth="2dp">
@@ -235,7 +235,7 @@
                             android:padding="14dp"
                             android:text="Sí"
                             android:textColor="@color/s2r_text_primary"
-                            android:textSize="18sp"
+                            android:textSize="16sp"
                             android:gravity="center" />
                     </com.google.android.material.card.MaterialCardView>
 
@@ -244,7 +244,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="6dp"
-                        app:cardBackgroundColor="@color/s2r_card"
+                        app:cardBackgroundColor="@color/s2r_surface"
                         app:cardCornerRadius="24dp"
                         app:strokeColor="#3B82F6"
                         app:strokeWidth="2dp">
@@ -255,7 +255,7 @@
                             android:padding="14dp"
                             android:text="No"
                             android:textColor="@color/s2r_text_primary"
-                            android:textSize="18sp"
+                            android:textSize="16sp"
                             android:gravity="center" />
                     </com.google.android.material.card.MaterialCardView>
 
@@ -264,7 +264,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="6dp"
-                        app:cardBackgroundColor="@color/s2r_card"
+                        app:cardBackgroundColor="@color/s2r_surface"
                         app:cardCornerRadius="24dp"
                         app:strokeColor="#3B82F6"
                         app:strokeWidth="2dp">
@@ -275,7 +275,7 @@
                             android:padding="14dp"
                             android:text="Repite"
                             android:textColor="@color/s2r_text_primary"
-                            android:textSize="18sp"
+                            android:textSize="16sp"
                             android:gravity="center" />
                     </com.google.android.material.card.MaterialCardView>
 
@@ -284,7 +284,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="6dp"
-                        app:cardBackgroundColor="@color/s2r_card"
+                        app:cardBackgroundColor="@color/s2r_surface"
                         app:cardCornerRadius="24dp"
                         app:strokeColor="#3B82F6"
                         app:strokeWidth="2dp">
@@ -295,7 +295,7 @@
                             android:padding="14dp"
                             android:text="Ayuda"
                             android:textColor="@color/s2r_text_primary"
-                            android:textSize="18sp"
+                            android:textSize="16sp"
                             android:gravity="center" />
                     </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
@@ -325,7 +325,7 @@
                     android:paddingHorizontal="8dp"
                     android:textColor="@color/s2r_text_primary"
                     android:textColorHint="@color/s2r_text_primary"
-                    android:textSize="18sp" />
+                    android:textSize="16sp" />
 
                 <ImageButton
                     android:id="@+id/btnSpeaker"

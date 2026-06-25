@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <solid android:color="@color/s2r_card"/>
-
+    <solid android:color="@android:color/transparent"/>
     <corners android:radius="24dp"/>
-
     <stroke
         android:width="2dp"
-        android:color="#3B82F6"/>
-
+        android:color="@color/s2r_accent"/>
 </shape>
