@@ -17,6 +17,7 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.core.content.ContextCompat
@@ -126,7 +127,12 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
         }
 
         fabEmergencyHelp.setOnClickListener {
-            sendQuickReply("¡Necesito ayuda urgente!")
+            Toast.makeText(this, "Mantén presionado para enviar alerta de auxilio", Toast.LENGTH_SHORT).show()
+        }
+
+        fabEmergencyHelp.setOnLongClickListener {
+            sendQuickReply("¡NECESITO AYUDA URGENTE!")
+            true
         }
 
         // Initial context load
