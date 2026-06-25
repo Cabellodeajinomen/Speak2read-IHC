@@ -206,16 +206,15 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
     private fun setupBottomNavigation() {
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_home -> {
-                    loadMessages()
-                    true
-                }
+                R.id.nav_home -> true
                 R.id.nav_conversations -> {
-                    Toast.makeText(this, "Próximamente: Historial de Chats", Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this, ConversationsActivity::class.java))
+                    finish()
                     true
                 }
                 R.id.nav_favorites -> {
-                    loadFavorites()
+                    startActivity(Intent(this, FavoritesActivity::class.java))
+                    finish()
                     true
                 }
                 R.id.nav_settings -> {
@@ -305,20 +304,6 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
     private fun loadMessages() {
         val savedMessages = database.messageDao().getAll()
         val chatMessages = savedMessages.map {
-            ChatMessage(
-                id = it.id,
-                text = it.text,
-                type = if (it.type == "SEND") MessageType.SEND else MessageType.RECEIVE,
-                isFavorite = it.isFavorite
-            )
-        }
-        adapter.submitMessages(chatMessages)
-        if (adapter.itemCount > 0) rvChat.scrollToPosition(adapter.itemCount - 1)
-    }
-
-    private fun loadFavorites() {
-        val favorites = database.messageDao().getFavorites()
-        val chatMessages = favorites.map {
             ChatMessage(
                 id = it.id,
                 text = it.text,

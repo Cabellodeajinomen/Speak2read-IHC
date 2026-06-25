@@ -8,10 +8,12 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Switch
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class SettingsActivity : Activity() {
 
     private val prefsName = "s2r_settings"
+    private lateinit var bottomNav: BottomNavigationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +51,34 @@ class SettingsActivity : Activity() {
 
         findViewById<Button>(R.id.btnCustomReplies).setOnClickListener {
             showCustomRepliesDialog()
+        }
+
+        bottomNav = findViewById(R.id.bottom_navigation)
+        bottomNav.selectedItemId = R.id.nav_settings
+        setupBottomNavigation()
+    }
+
+    private fun setupBottomNavigation() {
+        bottomNav.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_home -> {
+                    startActivity(Intent(this, HomeActivity::class.java))
+                    finish()
+                    true
+                }
+                R.id.nav_conversations -> {
+                    startActivity(Intent(this, ConversationsActivity::class.java))
+                    finish()
+                    true
+                }
+                R.id.nav_favorites -> {
+                    startActivity(Intent(this, FavoritesActivity::class.java))
+                    finish()
+                    true
+                }
+                R.id.nav_settings -> true
+                else -> false
+            }
         }
     }
 

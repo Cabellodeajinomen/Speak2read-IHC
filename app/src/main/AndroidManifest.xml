@@ -41,6 +41,14 @@
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.Speak2Read" />
         <activity
+            android:name=".ConversationsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Speak2Read" />
+        <activity
+            android:name=".FavoritesActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Speak2Read" />
+        <activity
             android:name=".FullscreenTranscriptionActivity"
             android:exported="false"
             android:theme="@style/Theme.Speak2Read" />

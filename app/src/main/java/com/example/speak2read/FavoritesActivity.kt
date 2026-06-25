@@ -1,0 +1,124 @@
+package com.example.speak2read
+
+import android.app.Activity
+import android.content.Intent
+import android.os.Bundle
+import android.speech.tts.TextToSpeech
+import android.widget.Toast
+import android.view.View
+import android.widget.LinearLayout
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.room.Room
+import com.example.speak2read.adapter.ChatAdapter
+import com.example.speak2read.database.Speak2ReadDatabase
+import com.example.speak2read.model.ChatMessage
+import com.example.speak2read.model.MessageType
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import java.util.Locale
+
+class FavoritesActivity : Activity(), TextToSpeech.OnInitListener {
+
+    private lateinit var rvFavorites: RecyclerView
+    private lateinit var emptyState: android.widget.LinearLayout
+    private lateinit var adapter: ChatAdapter
+    private lateinit var bottomNav: BottomNavigationView
+    private lateinit var database: Speak2ReadDatabase
+    private var tts: TextToSpeech? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_favorites)
+
+        tts = TextToSpeech(this, this)
+        rvFavorites = findViewById(R.id.recyclerFavorites)
+        emptyState = findViewById(R.id.emptyStateFavorites)
+        bottomNav = findViewById(R.id.bottom_navigation)
+        bottomNav.selectedItemId = R.id.nav_favorites
+
+        database = Room.databaseBuilder(
+            applicationContext,
+            Speak2ReadDatabase::class.java,
+            "speak2read_db"
+        )
+            .allowMainThreadQueries()
+            .fallbackToDestructiveMigration()
+            .build()
+
+        adapter = ChatAdapter(
+            onExpandMessage = { /* Optional: show zoom */ },
+            onSpeakMessage = { message -> speakText(message) },
+            onFavoriteMessage = { message -> toggleFavorite(message) }
+        )
+        rvFavorites.layoutManager = LinearLayoutManager(this)
+        rvFavorites.adapter = adapter
+
+        loadFavorites()
+        setupBottomNavigation()
+    }
+
+    private fun setupBottomNavigation() {
+        bottomNav.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_home -> {
+                    startActivity(Intent(this, HomeActivity::class.java))
+                    finish()
+                    true
+                }
+                R.id.nav_conversations -> {
+                    startActivity(Intent(this, ConversationsActivity::class.java))
+                    finish()
+                    true
+                }
+                R.id.nav_favorites -> true
+                R.id.nav_settings -> {
+                    startActivity(Intent(this, SettingsActivity::class.java))
+                    false
+                }
+                else -> false
+            }
+        }
+    }
+
+    private fun loadFavorites() {
+        val favorites = database.messageDao().getFavorites()
+        val chatMessages = favorites.map {
+            ChatMessage(
+                id = it.id,
+                text = it.text,
+                type = if (it.type == "SEND") MessageType.SEND else MessageType.RECEIVE,
+                isFavorite = it.isFavorite
+            )
+        }
+        adapter.submitMessages(chatMessages)
+        
+        if (chatMessages.isEmpty()) {
+            emptyState.visibility = View.VISIBLE
+            rvFavorites.visibility = View.GONE
+        } else {
+            emptyState.visibility = View.GONE
+            rvFavorites.visibility = View.VISIBLE
+        }
+    }
+
+    private fun toggleFavorite(message: ChatMessage) {
+        val newStatus = !message.isFavorite
+        database.messageDao().updateFavorite(message.id, newStatus)
+        loadFavorites() // Refresh list
+        val msg = if (newStatus) "Agregado a favoritos" else "Quitado de favoritos"
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun speakText(text: String) {
+        tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "speakId")
+    }
+
+    override fun onInit(status: Int) {
+        if (status == TextToSpeech.SUCCESS) tts?.language = Locale.getDefault()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        tts?.shutdown()
+    }
+}
