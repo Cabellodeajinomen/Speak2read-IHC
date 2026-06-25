@@ -49,7 +49,7 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
     private lateinit var btnAcknowledge: android.widget.Button
     private lateinit var emergencyOverlay: View
     private lateinit var imgWarning: ImageView
-    private lateinit var fabEmergencyHelp: View
+    private lateinit var btnSosHeader: View
 
     private lateinit var database: Speak2ReadDatabase
     private var listening = false
@@ -63,7 +63,6 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
 
     private val emergencyReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            // Mostrar overlay
             emergencyOverlay.visibility = View.VISIBLE
             startWarningBlink()
         }
@@ -88,7 +87,7 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
         emergencyOverlay = findViewById(R.id.emergencyOverlay)
         btnAcknowledge = findViewById(R.id.btnAcknowledge)
         imgWarning = findViewById(R.id.imgWarning)
-        fabEmergencyHelp = findViewById(R.id.fabEmergencyHelp)
+        btnSosHeader = findViewById(R.id.btnSosHeader)
 
         database = Room.databaseBuilder(
             applicationContext,
@@ -108,138 +107,70 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
 
         loadMessages()
 
-        // Quick replies
+        // Quick replies clicks
         findViewById<View>(R.id.qr_si).setOnClickListener {
-            val text = findViewById<TextView>(R.id.tvQr1).text.toString()
-            sendQuickReply(text)
+            sendQuickReply(findViewById<TextView>(R.id.tvQr1).text.toString())
         }
         findViewById<View>(R.id.qr_no).setOnClickListener {
-            val text = findViewById<TextView>(R.id.tvQr2).text.toString()
-            sendQuickReply(text)
+            sendQuickReply(findViewById<TextView>(R.id.tvQr2).text.toString())
         }
         findViewById<View>(R.id.qr_repite).setOnClickListener {
-            val text = findViewById<TextView>(R.id.tvQr3).text.toString()
-            sendQuickReply(text)
+            sendQuickReply(findViewById<TextView>(R.id.tvQr3).text.toString())
         }
         findViewById<View>(R.id.qr_ayuda).setOnClickListener {
-            val text = findViewById<TextView>(R.id.tvQr4).text.toString()
-            sendQuickReply(text)
+            sendQuickReply(findViewById<TextView>(R.id.tvQr4).text.toString())
         }
 
-        fabEmergencyHelp.setOnClickListener {
-            Toast.makeText(this, "Mantén presionado para enviar alerta de auxilio", Toast.LENGTH_SHORT).show()
+        // SOS Button Header
+        btnSosHeader.setOnClickListener {
+            showSosConfirmation()
         }
 
-        fabEmergencyHelp.setOnLongClickListener {
-            sendQuickReply("¡NECESITO AYUDA URGENTE!")
-            true
-        }
-
-        // Initial context load
+        // Context Initial load
         updateQuickReplies(Speak2ReadPrefs.getCurrentContext(this))
 
-
-        // Settings
+        // Settings Button
         findViewById<ImageButton>(R.id.btnSettings).setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
 
-        findViewById<Button>(R.id.btnHospital)
-            .setOnClickListener {
+        // Context Buttons
+        findViewById<Button>(R.id.btnHospital).setOnClickListener {
+            setAppContext("HOSPITAL")
+        }
+        findViewById<Button>(R.id.btnTransporte).setOnClickListener {
+            setAppContext("TRANSPORTE")
+        }
+        findViewById<Button>(R.id.btnCompras).setOnClickListener {
+            setAppContext("COMPRAS")
+        }
+        findViewById<Button>(R.id.btnEmergencia).setOnClickListener {
+            setAppContext("EMERGENCIA")
+        }
+        findViewById<Button>(R.id.btnPersonalizado).setOnClickListener {
+            setAppContext("PERSONALIZADO")
+        }
 
-                Speak2ReadPrefs.setCurrentContext(
-                    this,
-                    "HOSPITAL"
-                )
-
-                updateQuickReplies("HOSPITAL")
-            }
-
-        findViewById<Button>(R.id.btnTransporte)
-            .setOnClickListener {
-
-                Speak2ReadPrefs.setCurrentContext(
-                    this,
-                    "TRANSPORTE"
-                )
-
-                updateQuickReplies("TRANSPORTE")
-            }
-
-        findViewById<Button>(R.id.btnCompras)
-            .setOnClickListener {
-
-                Speak2ReadPrefs.setCurrentContext(
-                    this,
-                    "COMPRAS"
-                )
-
-                updateQuickReplies("COMPRAS")
-            }
-
-        findViewById<Button>(R.id.btnEmergencia)
-            .setOnClickListener {
-
-                Speak2ReadPrefs.setCurrentContext(
-                    this,
-                    "EMERGENCIA"
-                )
-
-                updateQuickReplies("EMERGENCIA")
-            }
-
-        findViewById<Button>(R.id.btnPersonalizado)
-            .setOnClickListener {
-                Speak2ReadPrefs.setCurrentContext(this, "PERSONALIZADO")
-                updateQuickReplies("PERSONALIZADO")
-            }
-        // Mic único para STT (simulado)
+        // Voice Transcription
         btnMicTranscription.setOnClickListener {
-
-            if (
-                ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.RECORD_AUDIO
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.RECORD_AUDIO),
-                    REQUEST_RECORD_AUDIO
-                )
-
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), REQUEST_RECORD_AUDIO)
                 return@setOnClickListener
             }
-
             startMicPulse()
-
-            val intent =
-                Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-
-            intent.putExtra(
-                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
-            )
-
-            intent.putExtra(
-                RecognizerIntent.EXTRA_LANGUAGE,
-                "es-PE"
-            )
-
+            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE, "es-PE")
+            }
             speechRecognizer?.startListening(intent)
-
             listening = true
         }
 
-
-        // Mic transcription button (simulado): agrega texto a transcription
         btnMicTranscription.setOnLongClickListener {
             etTranscription.setText(getString(R.string.home_transcription_sample))
             true
         }
 
-        // Fullscreen transcription: abrir nueva Activity simple que muestra texto en grande
         btnFullscreenTranscription.setOnClickListener {
             val intent = Intent(this, FullscreenTranscriptionActivity::class.java)
             intent.putExtra("text", etTranscription.text.toString())
@@ -247,121 +178,82 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
         }
 
         btnSendTranscription.setOnClickListener {
-
             val text = etTranscription.text.toString().trim()
-
             if (text.isNotEmpty()) {
-
-                addMessage(
-                    text,
-                    MessageType.RECEIVE
-                )
-
+                addMessage(text, MessageType.RECEIVE)
                 etTranscription.text?.clear()
             }
         }
 
-        // Speaker (TTS)
+        // My Messages
         btnSpeaker.setOnClickListener {
-            val text = etMessage.text.toString()
-            speakText(text)
+            speakText(etMessage.text.toString())
         }
 
         btnSendMessage.setOnClickListener {
-
             val text = etMessage.text.toString().trim()
-
             if (text.isNotEmpty()) {
-
-                addMessage(
-                    text,
-                    MessageType.SEND
-                )
-
+                addMessage(text, MessageType.SEND)
                 speakText(text)
-
                 etMessage.text?.clear()
             }
         }
 
-        // Overlay acknowledge
         btnAcknowledge.setOnClickListener {
             emergencyOverlay.visibility = View.GONE
             stopWarningBlink()
         }
-
     }
-    private fun configureSpeechRecognizer() {
 
-        speechRecognizer?.setRecognitionListener(
-            object : RecognitionListener {
+    private fun setAppContext(ctx: String) {
+        Speak2ReadPrefs.setCurrentContext(this, ctx)
+        updateQuickReplies(ctx)
+    }
 
-                override fun onReadyForSpeech(params: Bundle?) {}
-
-                override fun onBeginningOfSpeech() {}
-
-                override fun onRmsChanged(rmsdB: Float) {}
-
-                override fun onBufferReceived(buffer: ByteArray?) {}
-
-                override fun onEndOfSpeech() {
-                    stopMicPulse()
-                    listening = false
-                }
-
-                override fun onError(error: Int) {
-
-                    stopMicPulse()
-                    listening = false
-
-                    android.widget.Toast.makeText(
-                        this@HomeActivity,
-                        "Error STT: $error",
-                        android.widget.Toast.LENGTH_LONG
-                    ).show()
-                }
-
-                override fun onResults(results: Bundle?) {
-
-                    val matches =
-                        results?.getStringArrayList(
-                            SpeechRecognizer.RESULTS_RECOGNITION
-                        )
-
-                    if (!matches.isNullOrEmpty()) {
-
-                        val recognizedText = matches[0]
-
-                        etTranscription.setText(recognizedText)
-                    }
-                }
-
-                override fun onPartialResults(partialResults: Bundle?) {}
-
-                override fun onEvent(eventType: Int, params: Bundle?) {}
+    private fun showSosConfirmation() {
+        AlertDialog.Builder(this)
+            .setTitle("Confirmar Alerta SOS")
+            .setMessage("¿Estás seguro de que quieres enviar un mensaje de ayuda urgente?")
+            .setPositiveButton("ENVIAR SOS") { _, _ ->
+                sendQuickReply("¡NECESITO AYUDA URGENTE! (Alerta SOS)")
             }
-        )
+            .setNegativeButton("Cancelar", null)
+            .show()
     }
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(
-            requestCode,
-            permissions,
-            grantResults
-        )
 
-        if (
-            requestCode == REQUEST_RECORD_AUDIO &&
-            grantResults.isNotEmpty() &&
-            grantResults[0] == PackageManager.PERMISSION_GRANTED
-        ) {
+    private fun configureSpeechRecognizer() {
+        speechRecognizer?.setRecognitionListener(object : RecognitionListener {
+            override fun onReadyForSpeech(params: Bundle?) {}
+            override fun onBeginningOfSpeech() {}
+            override fun onRmsChanged(rmsdB: Float) {}
+            override fun onBufferReceived(buffer: ByteArray?) {}
+            override fun onEndOfSpeech() {
+                stopMicPulse()
+                listening = false
+            }
+            override fun onError(error: Int) {
+                stopMicPulse()
+                listening = false
+                Toast.makeText(this@HomeActivity, "Error STT: $error", Toast.LENGTH_LONG).show()
+            }
+            override fun onResults(results: Bundle?) {
+                val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                if (!matches.isNullOrEmpty()) {
+                    etTranscription.setText(matches[0])
+                }
+            }
+            override fun onPartialResults(partialResults: Bundle?) {}
+            override fun onEvent(eventType: Int, params: Bundle?) {}
+        })
+    }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_RECORD_AUDIO && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             btnMicTranscription.performClick()
         }
     }
+
     override fun onStart() {
         super.onStart()
         registerEmergencyReceiverIfNeeded()
@@ -374,25 +266,16 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
 
     private fun addMessage(text: String, type: MessageType) {
         adapter.addMessage(ChatMessage(text, type))
-        database.messageDao().insert(
-            ChatMessageEntity(text = text, type = type.name)
-        )
+        database.messageDao().insert(ChatMessageEntity(text = text, type = type.name))
         rvChat.scrollToPosition(adapter.itemCount - 1)
     }
 
     private fun loadMessages() {
         val savedMessages = database.messageDao().getAll()
         savedMessages.forEach {
-            adapter.addMessage(
-                ChatMessage(
-                    it.text,
-                    if (it.type == "SEND") MessageType.SEND else MessageType.RECEIVE
-                )
-            )
+            adapter.addMessage(ChatMessage(it.text, if (it.type == "SEND") MessageType.SEND else MessageType.RECEIVE))
         }
-        if (adapter.itemCount > 0) {
-            rvChat.scrollToPosition(adapter.itemCount - 1)
-        }
+        if (adapter.itemCount > 0) rvChat.scrollToPosition(adapter.itemCount - 1)
     }
 
     private fun showExpandedMessage(message: String) {
@@ -405,25 +288,16 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
 
     override fun onDestroy() {
         super.onDestroy()
-
         unregisterEmergencyReceiverIfNeeded()
-
         speechRecognizer?.destroy()
-
         tts?.stop()
         tts?.shutdown()
     }
 
     private fun registerEmergencyReceiverIfNeeded() {
         if (receiverRegistered) return
-
         val filter = IntentFilter(emergencyAction)
-        ContextCompat.registerReceiver(
-            this,
-            emergencyReceiver,
-            filter,
-            ContextCompat.RECEIVER_NOT_EXPORTED
-        )
+        ContextCompat.registerReceiver(this, emergencyReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
         receiverRegistered = true
     }
 
@@ -434,9 +308,7 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
     }
 
     override fun onInit(status: Int) {
-        if (status == TextToSpeech.SUCCESS) {
-            tts?.language = Locale.getDefault()
-        }
+        if (status == TextToSpeech.SUCCESS) tts?.language = Locale.getDefault()
     }
 
     private fun speakText(text: String) {
@@ -451,7 +323,6 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
             repeatCount = ObjectAnimator.INFINITE
             start()
         }
-        // Also scale Y
         ObjectAnimator.ofFloat(btnMicTranscription, "scaleY", 1f, 1.15f).apply {
             duration = 400
             interpolator = LinearInterpolator()
@@ -459,7 +330,7 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
             repeatCount = ObjectAnimator.INFINITE
             start()
         }
-        btnMicTranscription.setColorFilter(resources.getColor(R.color.s2r_bubble_usuario, null))
+        btnMicTranscription.setColorFilter(ContextCompat.getColor(this, R.color.s2r_bubble_usuario))
     }
 
     private fun stopMicPulse() {
@@ -484,49 +355,41 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
     }
 
     private fun sendQuickReply(text: String) {
-        etMessage.setText(text)
         addMessage(text, MessageType.SEND)
         speakText(text)
-        etMessage.text.clear()
     }
 
     private fun updateQuickReplies(context: String) {
-
         val tvQr1 = findViewById<TextView>(R.id.tvQr1)
         val tvQr2 = findViewById<TextView>(R.id.tvQr2)
         val tvQr3 = findViewById<TextView>(R.id.tvQr3)
         val tvQr4 = findViewById<TextView>(R.id.tvQr4)
 
         when(context) {
-
             "HOSPITAL" -> {
                 tvQr1.text = "Tengo una cita"
                 tvQr2.text = "Necesito ayuda"
                 tvQr3.text = "¿Dónde debo ir?"
                 tvQr4.text = "Repita por favor"
             }
-
             "TRANSPORTE" -> {
                 tvQr1.text = "¿Qué bus debo tomar?"
                 tvQr2.text = "¿Cuánto cuesta?"
                 tvQr3.text = "¿Dónde bajo?"
                 tvQr4.text = "Gracias"
             }
-
             "COMPRAS" -> {
                 tvQr1.text = "¿Cuánto cuesta?"
                 tvQr2.text = "Quiero comprar esto"
                 tvQr3.text = "¿Acepta tarjeta?"
                 tvQr4.text = "Gracias"
             }
-
             "EMERGENCIA" -> {
                 tvQr1.text = "Necesito ayuda"
                 tvQr2.text = "Llame a emergencias"
                 tvQr3.text = "Estoy perdido"
                 tvQr4.text = "Repita por favor"
             }
-
             "PERSONALIZADO" -> {
                 val custom = Speak2ReadPrefs.getCustomReplies(this)
                 tvQr1.text = custom[0]
@@ -534,7 +397,6 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
                 tvQr3.text = custom[2]
                 tvQr4.text = custom[3]
             }
-
             else -> {
                 tvQr1.text = "Sí"
                 tvQr2.text = "No"
@@ -543,6 +405,4 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
             }
         }
     }
-
 }
-

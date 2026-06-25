@@ -4,10 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:layout_marginTop="6dp"
-    android:layout_marginBottom="6dp"
-    android:layout_marginStart="12dp"
-    android:layout_marginEnd="12dp">
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="8dp"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="64dp">
 
     <TextView
         android:id="@+id/tvMessageReceive"
@@ -15,22 +15,25 @@
         android:layout_height="wrap_content"
         android:maxWidth="280dp"
         android:background="@drawable/bg_chat_receive"
-        android:paddingHorizontal="14dp"
-        android:paddingVertical="10dp"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp"
         android:textColor="@color/s2r_text_primary"
         android:textIsSelectable="true"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:elevation="1dp"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="2dp">
+        android:layout_marginTop="4dp"
+        android:layout_marginStart="4dp"
+        android:alpha="0.6">
 
         <ImageButton
             android:id="@+id/btnSpeakReceive"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/speak_message"
             android:src="@android:drawable/ic_lock_silent_mode_off"
@@ -40,8 +43,8 @@
 
         <ImageButton
             android:id="@+id/btnExpandReceive"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/expand_message"
             android:src="@android:drawable/ic_menu_zoom"
