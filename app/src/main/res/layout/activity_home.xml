@@ -16,7 +16,7 @@
         <Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="?attr/actionBarSize"
             android:background="@color/s2r_background"
             android:contentInsetStart="16dp"
             android:contentInsetEnd="12dp"
@@ -28,64 +28,80 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_gravity="end|center_vertical"
-                android:background="@android:color/transparent"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/settings"
                 android:padding="8dp"
                 android:src="@android:drawable/ic_menu_manage"
-                android:tint="@color/s2r_text_primary" />
+                app:tint="@color/s2r_text_primary" />
         </Toolbar>
 
         <!-- Categories -->
         <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:scrollbars="none">
+            android:scrollbars="none"
+            android:paddingVertical="4dp">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="8dp">
+                android:paddingHorizontal="12dp">
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnHospital"
-                    style="?android:attr/borderlessButtonStyle"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="48dp"
                     android:text="🏥 Hospital"
-                    android:textAllCaps="false"/>
+                    android:textAllCaps="false"
+                    android:textColor="@color/s2r_text_primary"
+                    android:paddingHorizontal="16dp"
+                    app:rippleColor="#33FFFFFF"/>
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnTransporte"
-                    style="?android:attr/borderlessButtonStyle"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="48dp"
                     android:text="🚌 Transporte"
-                    android:textAllCaps="false"/>
+                    android:textAllCaps="false"
+                    android:textColor="@color/s2r_text_primary"
+                    android:paddingHorizontal="16dp"
+                    app:rippleColor="#33FFFFFF"/>
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnCompras"
-                    style="?android:attr/borderlessButtonStyle"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="48dp"
                     android:text="🛒 Compras"
-                    android:textAllCaps="false"/>
+                    android:textAllCaps="false"
+                    android:textColor="@color/s2r_text_primary"
+                    android:paddingHorizontal="16dp"
+                    app:rippleColor="#33FFFFFF"/>
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnEmergencia"
-                    style="?android:attr/borderlessButtonStyle"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="48dp"
                     android:text="🚨 Emergencia"
-                    android:textAllCaps="false"/>
+                    android:textAllCaps="false"
+                    android:textColor="@color/s2r_text_primary"
+                    android:paddingHorizontal="16dp"
+                    app:rippleColor="#33FFFFFF"/>
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnPersonalizado"
-                    style="?android:attr/borderlessButtonStyle"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="48dp"
                     android:text="⭐ Personalizado"
-                    android:textAllCaps="false"/>
+                    android:textAllCaps="false"
+                    android:textColor="@color/s2r_text_primary"
+                    android:paddingHorizontal="16dp"
+                    app:rippleColor="#33FFFFFF"/>
 
             </LinearLayout>
         </HorizontalScrollView>
@@ -94,8 +110,7 @@
         <LinearLayout
             android:id="@+id/transcriptionContainer"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="3.5"
+            android:layout_height="140dp"
             android:orientation="vertical"
             android:paddingHorizontal="16dp"
             android:paddingTop="8dp">
@@ -103,18 +118,19 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="INTERLOCUTOR"
+                android:text="@string/label_interlocutor"
                 android:textColor="@color/s2r_text_primary"
                 android:textStyle="bold"
-                android:textSize="14sp"
+                android:textSize="12sp"
+                android:textAllCaps="true"
                 android:alpha="0.7"/>
 
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="6dp"
                 android:background="@drawable/bg_input_container"
-                android:padding="12dp">
+                android:padding="10dp">
 
                 <EditText
                     android:id="@+id/etTranscription"
@@ -126,8 +142,8 @@
                     android:inputType="textMultiLine"
                     android:gravity="top"
                     android:textColor="@color/s2r_text_primary"
-                    android:textColorHint="@color/s2r_text_primary"
-                    android:textSize="32sp"
+                    android:textColorHint="@color/s2r_text_secondary"
+                    android:textSize="22sp"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -138,30 +154,30 @@
 
                     <ImageButton
                         android:id="@+id/btnMicTranscription"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
                         android:background="?android:attr/selectableItemBackgroundBorderless"
                         android:contentDescription="@string/microfono"
                         android:src="@android:drawable/ic_btn_speak_now"
-                        android:tint="@color/s2r_text_primary" />
+                        app:tint="@color/s2r_text_primary" />
 
                     <ImageButton
                         android:id="@+id/btnFullscreenTranscription"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
                         android:background="?android:attr/selectableItemBackgroundBorderless"
                         android:contentDescription="@string/fullscreen_transcription"
                         android:src="@android:drawable/ic_menu_view"
-                        android:tint="@color/s2r_text_primary" />
+                        app:tint="@color/s2r_text_primary" />
 
                     <ImageButton
                         android:id="@+id/btnSendTranscription"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
                         android:background="?android:attr/selectableItemBackgroundBorderless"
                         android:contentDescription="@string/send_message"
                         android:src="@android:drawable/ic_menu_send"
-                        android:tint="@color/s2r_text_primary" />
+                        app:tint="@color/s2r_text_primary" />
                 </LinearLayout>
             </FrameLayout>
         </LinearLayout>
@@ -170,18 +186,19 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="3.5"
+            android:layout_weight="1"
             android:orientation="vertical"
-            android:paddingHorizontal="12dp"
+            android:paddingHorizontal="16dp"
             android:paddingTop="12dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="HISTORIAL"
+                android:text="@string/label_historial"
                 android:textColor="@color/s2r_text_primary"
                 android:textStyle="bold"
-                android:textSize="14sp"
+                android:textSize="12sp"
+                android:textAllCaps="true"
                 android:alpha="0.7"/>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -199,107 +216,112 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="12dp"
+            android:paddingHorizontal="16dp"
             android:paddingBottom="12dp"
-            android:background="@color/s2r_background"
-            android:elevation="8dp">
+            android:background="@color/s2r_background">
 
-            <HorizontalScrollView
-                android:id="@+id/quickReplyScroll"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_mi_respuesta"
+                android:textColor="@color/s2r_text_primary"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                android:textAllCaps="true"
+                android:alpha="0.7"/>
+
+            <androidx.gridlayout.widget.GridLayout
+                android:id="@+id/quickReplyGrid"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:scrollbars="none">
+                android:layout_marginTop="4dp"
+                app:columnCount="2"
+                app:alignmentMode="alignMargins">
 
-                <LinearLayout
-                    android:id="@+id/quickReplyContainer"
-                    android:layout_width="wrap_content"
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/qr_si"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingVertical="6dp">
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/qr_si"
-                        android:layout_width="wrap_content"
+                    app:layout_columnWeight="1"
+                    android:layout_margin="4dp"
+                    app:cardBackgroundColor="@color/s2r_surface"
+                    app:cardCornerRadius="12dp"
+                    app:strokeColor="@color/s2r_accent"
+                    app:strokeWidth="1dp">
+                    <TextView
+                        android:id="@+id/tvQr1"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_margin="6dp"
-                        app:cardBackgroundColor="@color/s2r_surface"
-                        app:cardCornerRadius="24dp"
-                        app:strokeColor="#3B82F6"
-                        app:strokeWidth="2dp">
-                        <TextView
-                            android:id="@+id/tvQr1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:padding="14dp"
-                            android:text="Sí"
-                            android:textColor="@color/s2r_text_primary"
-                            android:textSize="16sp"
-                            android:gravity="center" />
-                    </com.google.android.material.card.MaterialCardView>
+                        android:padding="12dp"
+                        android:text="Sí"
+                        android:textColor="@color/s2r_text_primary"
+                        android:textSize="14sp"
+                        android:gravity="center" />
+                </com.google.android.material.card.MaterialCardView>
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/qr_no"
-                        android:layout_width="wrap_content"
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/qr_no"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_columnWeight="1"
+                    android:layout_margin="4dp"
+                    app:cardBackgroundColor="@color/s2r_surface"
+                    app:cardCornerRadius="12dp"
+                    app:strokeColor="@color/s2r_accent"
+                    app:strokeWidth="1dp">
+                    <TextView
+                        android:id="@+id/tvQr2"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_margin="6dp"
-                        app:cardBackgroundColor="@color/s2r_surface"
-                        app:cardCornerRadius="24dp"
-                        app:strokeColor="#3B82F6"
-                        app:strokeWidth="2dp">
-                        <TextView
-                            android:id="@+id/tvQr2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:padding="14dp"
-                            android:text="No"
-                            android:textColor="@color/s2r_text_primary"
-                            android:textSize="16sp"
-                            android:gravity="center" />
-                    </com.google.android.material.card.MaterialCardView>
+                        android:padding="12dp"
+                        android:text="No"
+                        android:textColor="@color/s2r_text_primary"
+                        android:textSize="14sp"
+                        android:gravity="center" />
+                </com.google.android.material.card.MaterialCardView>
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/qr_repite"
-                        android:layout_width="wrap_content"
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/qr_repite"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_columnWeight="1"
+                    android:layout_margin="4dp"
+                    app:cardBackgroundColor="@color/s2r_surface"
+                    app:cardCornerRadius="12dp"
+                    app:strokeColor="@color/s2r_accent"
+                    app:strokeWidth="1dp">
+                    <TextView
+                        android:id="@+id/tvQr3"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_margin="6dp"
-                        app:cardBackgroundColor="@color/s2r_surface"
-                        app:cardCornerRadius="24dp"
-                        app:strokeColor="#3B82F6"
-                        app:strokeWidth="2dp">
-                        <TextView
-                            android:id="@+id/tvQr3"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:padding="14dp"
-                            android:text="Repite"
-                            android:textColor="@color/s2r_text_primary"
-                            android:textSize="16sp"
-                            android:gravity="center" />
-                    </com.google.android.material.card.MaterialCardView>
+                        android:padding="12dp"
+                        android:text="Repite"
+                        android:textColor="@color/s2r_text_primary"
+                        android:textSize="14sp"
+                        android:gravity="center" />
+                </com.google.android.material.card.MaterialCardView>
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/qr_ayuda"
-                        android:layout_width="wrap_content"
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/qr_ayuda"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_columnWeight="1"
+                    android:layout_margin="4dp"
+                    app:cardBackgroundColor="@color/s2r_surface"
+                    app:cardCornerRadius="12dp"
+                    app:strokeColor="@color/s2r_accent"
+                    app:strokeWidth="1dp">
+                    <TextView
+                        android:id="@+id/tvQr4"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_margin="6dp"
-                        app:cardBackgroundColor="@color/s2r_surface"
-                        app:cardCornerRadius="24dp"
-                        app:strokeColor="#3B82F6"
-                        app:strokeWidth="2dp">
-                        <TextView
-                            android:id="@+id/tvQr4"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:padding="14dp"
-                            android:text="Ayuda"
-                            android:textColor="@color/s2r_text_primary"
-                            android:textSize="16sp"
-                            android:gravity="center" />
-                    </com.google.android.material.card.MaterialCardView>
-                </LinearLayout>
-            </HorizontalScrollView>
+                        android:padding="12dp"
+                        android:text="Ayuda"
+                        android:textColor="@color/s2r_text_primary"
+                        android:textSize="14sp"
+                        android:gravity="center" />
+                </com.google.android.material.card.MaterialCardView>
+            </androidx.gridlayout.widget.GridLayout>
 
             <LinearLayout
                 android:id="@+id/inputArea"
@@ -324,31 +346,44 @@
                     android:minHeight="48dp"
                     android:paddingHorizontal="8dp"
                     android:textColor="@color/s2r_text_primary"
-                    android:textColorHint="@color/s2r_text_primary"
+                    android:textColorHint="@color/s2r_text_secondary"
                     android:textSize="16sp" />
 
                 <ImageButton
                     android:id="@+id/btnSpeaker"
                     android:layout_width="44dp"
                     android:layout_height="44dp"
-                    android:background="@android:color/transparent"
+                    android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/altavoz"
                     android:padding="8dp"
                     android:src="@android:drawable/ic_lock_silent_mode_off"
-                    android:tint="@color/s2r_text_primary" />
+                    app:tint="@color/s2r_text_primary" />
 
                 <ImageButton
                     android:id="@+id/btnSendMessage"
                     android:layout_width="44dp"
                     android:layout_height="44dp"
-                    android:background="@android:color/transparent"
+                    android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/send_message"
                     android:padding="8dp"
                     android:src="@android:drawable/ic_menu_send"
-                    android:tint="@color/s2r_text_primary" />
+                    app:tint="@color/s2r_text_primary" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
+
+    <!-- Floating Action Button for Emergency Help -->
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fabEmergencyHelp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="24dp"
+        android:text="@string/fab_ayuda"
+        android:textColor="@android:color/white"
+        app:backgroundTint="@color/s2r_alert"
+        app:icon="@android:drawable/ic_dialog_alert"
+        app:iconTint="@android:color/white" />
 
     <!-- Emergency Overlay -->
     <LinearLayout

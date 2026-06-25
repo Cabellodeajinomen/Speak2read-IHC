@@ -48,6 +48,7 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
     private lateinit var btnAcknowledge: android.widget.Button
     private lateinit var emergencyOverlay: View
     private lateinit var imgWarning: ImageView
+    private lateinit var fabEmergencyHelp: View
 
     private lateinit var database: Speak2ReadDatabase
     private var listening = false
@@ -86,6 +87,7 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
         emergencyOverlay = findViewById(R.id.emergencyOverlay)
         btnAcknowledge = findViewById(R.id.btnAcknowledge)
         imgWarning = findViewById(R.id.imgWarning)
+        fabEmergencyHelp = findViewById(R.id.fabEmergencyHelp)
 
         database = Room.databaseBuilder(
             applicationContext,
@@ -121,6 +123,10 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
         findViewById<View>(R.id.qr_ayuda).setOnClickListener {
             val text = findViewById<TextView>(R.id.tvQr4).text.toString()
             sendQuickReply(text)
+        }
+
+        fabEmergencyHelp.setOnClickListener {
+            sendQuickReply("¡Necesito ayuda urgente!")
         }
 
         // Initial context load

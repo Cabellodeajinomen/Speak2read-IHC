@@ -39,4 +39,8 @@
     <string name="speak_message">Escuchar mensaje</string>
     <string name="expanded_message_title">Mensaje expandido</string>
     <string name="emergency_detected">EMERGENCIA DETECTADA</string>
+    <string name="label_interlocutor">INTERLOCUTOR</string>
+    <string name="label_historial">HISTORIAL</string>
+    <string name="label_mi_respuesta">MI RESPUESTA</string>
+    <string name="fab_ayuda">🚨 AYUDA</string>
 </resources>
