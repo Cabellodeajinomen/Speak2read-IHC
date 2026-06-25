@@ -19,7 +19,6 @@ class LoginActivity : Activity() {
         val etPassword = findViewById<EditText>(R.id.etPassword)
         val btnLogin = findViewById<Button>(R.id.btnLogin)
         val btnRegister = findViewById<Button>(R.id.btnRegister)
-        val btnGuest = findViewById<Button>(R.id.btnGuest)
 
         btnLogin.setOnClickListener {
             val username = etUsername.text.toString().trim()
@@ -35,11 +34,6 @@ class LoginActivity : Activity() {
 
         btnRegister.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
-        }
-
-        btnGuest.setOnClickListener {
-            startActivity(Intent(this, HomeActivity::class.java))
-            finish()
         }
     }
 }
