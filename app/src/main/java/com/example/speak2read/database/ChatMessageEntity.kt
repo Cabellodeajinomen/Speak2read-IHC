@@ -8,5 +8,6 @@ data class ChatMessageEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val text: String,
-    val type: String
+    val type: String,
+    val isFavorite: Boolean = false
 )

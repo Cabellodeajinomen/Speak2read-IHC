@@ -6,7 +6,8 @@ enum class MessageType {
 }
 
 data class ChatMessage(
+    val id: Int = 0,
     val text: String,
-    val type: MessageType
+    val type: MessageType,
+    var isFavorite: Boolean = false
 )
-

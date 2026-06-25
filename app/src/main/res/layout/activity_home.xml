@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -11,7 +11,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_above="@id/bottom_navigation">
 
         <Toolbar
             android:id="@+id/toolbar"
@@ -54,6 +55,7 @@
             </LinearLayout>
         </Toolbar>
 
+        <!-- Categories -->
         <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -141,7 +143,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/label_interlocutor"
+                android:text="@string/sender_interlocutor"
                 android:textColor="@color/s2r_text_primary"
                 android:textStyle="bold"
                 android:textSize="12sp"
@@ -240,13 +242,13 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingHorizontal="16dp"
-            android:paddingBottom="12dp"
+            android:paddingBottom="8dp"
             android:background="@color/s2r_background">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/label_mi_respuesta"
+                android:text="@string/sender_me"
                 android:textColor="@color/s2r_text_primary"
                 android:textStyle="bold"
                 android:textSize="12sp"
@@ -264,7 +266,7 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/qr_si"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="48dp"
                     app:layout_columnWeight="1"
                     android:layout_margin="4dp"
                     app:cardBackgroundColor="@color/s2r_surface"
@@ -274,18 +276,18 @@
                     <TextView
                         android:id="@+id/tvQr1"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="12dp"
+                        android:layout_height="match_parent"
                         android:text="Sí"
                         android:textColor="@color/s2r_text_primary"
                         android:textSize="14sp"
-                        android:gravity="center" />
+                        android:gravity="center"
+                        android:minWidth="120dp"/>
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/qr_no"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="48dp"
                     app:layout_columnWeight="1"
                     android:layout_margin="4dp"
                     app:cardBackgroundColor="@color/s2r_surface"
@@ -295,18 +297,18 @@
                     <TextView
                         android:id="@+id/tvQr2"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="12dp"
+                        android:layout_height="match_parent"
                         android:text="No"
                         android:textColor="@color/s2r_text_primary"
                         android:textSize="14sp"
-                        android:gravity="center" />
+                        android:gravity="center"
+                        android:minWidth="120dp"/>
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/qr_repite"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="48dp"
                     app:layout_columnWeight="1"
                     android:layout_margin="4dp"
                     app:cardBackgroundColor="@color/s2r_surface"
@@ -316,18 +318,18 @@
                     <TextView
                         android:id="@+id/tvQr3"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="12dp"
+                        android:layout_height="match_parent"
                         android:text="Repite"
                         android:textColor="@color/s2r_text_primary"
                         android:textSize="14sp"
-                        android:gravity="center" />
+                        android:gravity="center"
+                        android:minWidth="120dp"/>
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/qr_ayuda"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="48dp"
                     app:layout_columnWeight="1"
                     android:layout_margin="4dp"
                     app:cardBackgroundColor="@color/s2r_surface"
@@ -337,12 +339,12 @@
                     <TextView
                         android:id="@+id/tvQr4"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="12dp"
+                        android:layout_height="match_parent"
                         android:text="Ayuda"
                         android:textColor="@color/s2r_text_primary"
                         android:textSize="14sp"
-                        android:gravity="center" />
+                        android:gravity="center"
+                        android:minWidth="120dp"/>
                 </com.google.android.material.card.MaterialCardView>
             </androidx.gridlayout.widget.GridLayout>
 
@@ -395,6 +397,16 @@
         </LinearLayout>
     </LinearLayout>
 
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/s2r_surface"
+        app:itemIconTint="@color/s2r_text_secondary"
+        app:itemTextColor="@color/s2r_text_secondary"
+        app:menu="@menu/bottom_nav_menu" />
+
     <!-- Emergency Overlay -->
     <LinearLayout
         android:id="@+id/emergencyOverlay"
@@ -430,4 +442,4 @@
             android:text="@string/dialog_accept" />
     </LinearLayout>
 
-</FrameLayout>
+</RelativeLayout>

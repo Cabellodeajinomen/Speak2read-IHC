@@ -43,4 +43,10 @@
     <string name="label_historial">HISTORIAL</string>
     <string name="label_mi_respuesta">MI RESPUESTA</string>
     <string name="fab_ayuda">🚨 AYUDA</string>
+    <string name="nav_home">Inicio</string>
+    <string name="nav_chats">Chats</string>
+    <string name="nav_favorites">Favoritos</string>
+    <string name="nav_settings">Ajustes</string>
+    <string name="sender_interlocutor">👂 Interlocutor</string>
+    <string name="sender_me">🧏 Tú</string>
 </resources>

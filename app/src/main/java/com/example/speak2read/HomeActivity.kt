@@ -34,6 +34,7 @@ import androidx.core.app.ActivityCompat
 import androidx.room.Room
 import com.example.speak2read.database.ChatMessageEntity
 import com.example.speak2read.database.Speak2ReadDatabase
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class HomeActivity : Activity(), TextToSpeech.OnInitListener {
 
@@ -50,6 +51,7 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
     private lateinit var emergencyOverlay: View
     private lateinit var imgWarning: ImageView
     private lateinit var btnSosHeader: View
+    private lateinit var bottomNav: BottomNavigationView
 
     private lateinit var database: Speak2ReadDatabase
     private var listening = false
@@ -88,6 +90,7 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
         btnAcknowledge = findViewById(R.id.btnAcknowledge)
         imgWarning = findViewById(R.id.imgWarning)
         btnSosHeader = findViewById(R.id.btnSosHeader)
+        bottomNav = findViewById(R.id.bottom_navigation)
 
         database = Room.databaseBuilder(
             applicationContext,
@@ -95,12 +98,15 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
             "speak2read_db"
         )
             .allowMainThreadQueries()
+            .fallbackToDestructiveMigration() // Added for the schema change (isFavorite)
             .build()
 
         configureSpeechRecognizer()
+        
         adapter = ChatAdapter(
             onExpandMessage = { message -> showExpandedMessage(message) },
-            onSpeakMessage = { message -> speakText(message) }
+            onSpeakMessage = { message -> speakText(message) },
+            onFavoriteMessage = { message -> toggleFavorite(message) }
         )
         rvChat.layoutManager = LinearLayoutManager(this)
         rvChat.adapter = adapter
@@ -135,21 +141,11 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
         }
 
         // Context Buttons
-        findViewById<Button>(R.id.btnHospital).setOnClickListener {
-            setAppContext("HOSPITAL")
-        }
-        findViewById<Button>(R.id.btnTransporte).setOnClickListener {
-            setAppContext("TRANSPORTE")
-        }
-        findViewById<Button>(R.id.btnCompras).setOnClickListener {
-            setAppContext("COMPRAS")
-        }
-        findViewById<Button>(R.id.btnEmergencia).setOnClickListener {
-            setAppContext("EMERGENCIA")
-        }
-        findViewById<Button>(R.id.btnPersonalizado).setOnClickListener {
-            setAppContext("PERSONALIZADO")
-        }
+        findViewById<Button>(R.id.btnHospital).setOnClickListener { setAppContext("HOSPITAL") }
+        findViewById<Button>(R.id.btnTransporte).setOnClickListener { setAppContext("TRANSPORTE") }
+        findViewById<Button>(R.id.btnCompras).setOnClickListener { setAppContext("COMPRAS") }
+        findViewById<Button>(R.id.btnEmergencia).setOnClickListener { setAppContext("EMERGENCIA") }
+        findViewById<Button>(R.id.btnPersonalizado).setOnClickListener { setAppContext("PERSONALIZADO") }
 
         // Voice Transcription
         btnMicTranscription.setOnClickListener {
@@ -203,6 +199,32 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
             emergencyOverlay.visibility = View.GONE
             stopWarningBlink()
         }
+
+        setupBottomNavigation()
+    }
+
+    private fun setupBottomNavigation() {
+        bottomNav.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_home -> {
+                    loadMessages()
+                    true
+                }
+                R.id.nav_conversations -> {
+                    Toast.makeText(this, "Próximamente: Historial de Chats", Toast.LENGTH_SHORT).show()
+                    true
+                }
+                R.id.nav_favorites -> {
+                    loadFavorites()
+                    true
+                }
+                R.id.nav_settings -> {
+                    startActivity(Intent(this, SettingsActivity::class.java))
+                    false // Don't select it as it opens a new activity
+                }
+                else -> false
+            }
+        }
     }
 
     private fun setAppContext(ctx: String) {
@@ -219,6 +241,15 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
             }
             .setNegativeButton("Cancelar", null)
             .show()
+    }
+
+    private fun toggleFavorite(message: ChatMessage) {
+        val newStatus = !message.isFavorite
+        message.isFavorite = newStatus
+        database.messageDao().updateFavorite(message.id, newStatus)
+        adapter.notifyDataSetChanged()
+        val msg = if (newStatus) "Agregado a favoritos" else "Quitado de favoritos"
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
     }
 
     private fun configureSpeechRecognizer() {
@@ -265,16 +296,37 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
     }
 
     private fun addMessage(text: String, type: MessageType) {
-        adapter.addMessage(ChatMessage(text, type))
-        database.messageDao().insert(ChatMessageEntity(text = text, type = type.name))
+        val entity = ChatMessageEntity(text = text, type = type.name)
+        val id = database.messageDao().insert(entity).toInt()
+        adapter.addMessage(ChatMessage(id = id, text = text, type = type))
         rvChat.scrollToPosition(adapter.itemCount - 1)
     }
 
     private fun loadMessages() {
         val savedMessages = database.messageDao().getAll()
-        savedMessages.forEach {
-            adapter.addMessage(ChatMessage(it.text, if (it.type == "SEND") MessageType.SEND else MessageType.RECEIVE))
+        val chatMessages = savedMessages.map {
+            ChatMessage(
+                id = it.id,
+                text = it.text,
+                type = if (it.type == "SEND") MessageType.SEND else MessageType.RECEIVE,
+                isFavorite = it.isFavorite
+            )
         }
+        adapter.submitMessages(chatMessages)
+        if (adapter.itemCount > 0) rvChat.scrollToPosition(adapter.itemCount - 1)
+    }
+
+    private fun loadFavorites() {
+        val favorites = database.messageDao().getFavorites()
+        val chatMessages = favorites.map {
+            ChatMessage(
+                id = it.id,
+                text = it.text,
+                type = if (it.type == "SEND") MessageType.SEND else MessageType.RECEIVE,
+                isFavorite = it.isFavorite
+            )
+        }
+        adapter.submitMessages(chatMessages)
         if (adapter.itemCount > 0) rvChat.scrollToPosition(adapter.itemCount - 1)
     }
 

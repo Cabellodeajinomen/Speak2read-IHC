@@ -44,6 +44,17 @@
             android:scaleType="fitCenter"/>
 
         <ImageButton
+            android:id="@+id/btnFavoriteSend"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/nav_favorites"
+            android:src="@android:drawable/btn_star_big_off"
+            app:tint="@color/s2r_text_secondary"
+            android:padding="6dp"
+            android:scaleType="fitCenter" />
+
+        <ImageButton
             android:id="@+id/btnExpandSend"
             android:layout_width="32dp"
             android:layout_height="32dp"
