@@ -46,7 +46,7 @@ class FavoritesActivity : Activity(), TextToSpeech.OnInitListener {
             .build()
 
         adapter = ChatAdapter(
-            onExpandMessage = { /* Optional: show zoom */ },
+            onExpandMessage = { message -> showExpandedMessage(message) },
             onSpeakMessage = { message -> speakText(message) },
             onFavoriteMessage = { message -> toggleFavorite(message) }
         )
@@ -55,6 +55,12 @@ class FavoritesActivity : Activity(), TextToSpeech.OnInitListener {
 
         loadFavorites()
         setupBottomNavigation()
+    }
+
+    private fun showExpandedMessage(message: String) {
+        val intent = Intent(this, FullscreenTranscriptionActivity::class.java)
+        intent.putExtra("text", message)
+        startActivity(intent)
     }
 
     private fun setupBottomNavigation() {

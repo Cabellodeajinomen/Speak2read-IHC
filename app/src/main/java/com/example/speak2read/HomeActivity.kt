@@ -316,11 +316,9 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
     }
 
     private fun showExpandedMessage(message: String) {
-        AlertDialog.Builder(this)
-            .setTitle(getString(R.string.expanded_message_title))
-            .setMessage(message)
-            .setPositiveButton(getString(R.string.dialog_accept), null)
-            .show()
+        val intent = Intent(this, FullscreenTranscriptionActivity::class.java)
+        intent.putExtra("text", message)
+        startActivity(intent)
     }
 
     override fun onDestroy() {

@@ -57,4 +57,5 @@
     <string name="empty_chats_title">Historial de Chats</string>
     <string name="empty_chats_desc">Aquí aparecerán tus conversaciones guardadas próximamente.</string>
     <string name="slogan_login">Comunicación sin barreras</string>
+    <string name="btn_close">Cerrar</string>
 </resources>
