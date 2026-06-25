@@ -30,6 +30,9 @@ import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import androidx.core.app.ActivityCompat
+import androidx.room.Room
+import com.example.speak2read.database.ChatMessageEntity
+import com.example.speak2read.database.Speak2ReadDatabase
 
 class HomeActivity : Activity(), TextToSpeech.OnInitListener {
 
@@ -46,6 +49,7 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
     private lateinit var emergencyOverlay: View
     private lateinit var imgWarning: ImageView
 
+    private lateinit var database: Speak2ReadDatabase
     private var listening = false
     private var tts: TextToSpeech? = null
     private var micPulse: ObjectAnimator? = null
@@ -82,6 +86,15 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
         emergencyOverlay = findViewById(R.id.emergencyOverlay)
         btnAcknowledge = findViewById(R.id.btnAcknowledge)
         imgWarning = findViewById(R.id.imgWarning)
+
+        database = Room.databaseBuilder(
+            applicationContext,
+            Speak2ReadDatabase::class.java,
+            "speak2read_db"
+        )
+            .allowMainThreadQueries()
+            .build()
+
         configureSpeechRecognizer()
         adapter = ChatAdapter(
             onExpandMessage = { message -> showExpandedMessage(message) },
@@ -89,6 +102,8 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
         )
         rvChat.layoutManager = LinearLayoutManager(this)
         rvChat.adapter = adapter
+
+        loadMessages()
 
         // Quick replies
         findViewById<View>(R.id.qr_si).setOnClickListener {
@@ -347,7 +362,25 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
 
     private fun addMessage(text: String, type: MessageType) {
         adapter.addMessage(ChatMessage(text, type))
+        database.messageDao().insert(
+            ChatMessageEntity(text = text, type = type.name)
+        )
         rvChat.scrollToPosition(adapter.itemCount - 1)
+    }
+
+    private fun loadMessages() {
+        val savedMessages = database.messageDao().getAll()
+        savedMessages.forEach {
+            adapter.addMessage(
+                ChatMessage(
+                    it.text,
+                    if (it.type == "SEND") MessageType.SEND else MessageType.RECEIVE
+                )
+            )
+        }
+        if (adapter.itemCount > 0) {
+            rvChat.scrollToPosition(adapter.itemCount - 1)
+        }
     }
 
     private fun showExpandedMessage(message: String) {
