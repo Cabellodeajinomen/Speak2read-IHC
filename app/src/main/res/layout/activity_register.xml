@@ -48,6 +48,18 @@
         android:textColor="@color/s2r_text_primary"
         android:textColorHint="@color/s2r_text_secondary" />
 
+    <EditText
+        android:id="@+id/etConfirmPassword"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/bg_input_container"
+        android:hint="Confirmar contraseña"
+        android:inputType="textPassword"
+        android:paddingHorizontal="20dp"
+        android:textColor="@color/s2r_text_primary"
+        android:textColorHint="@color/s2r_text_secondary" />
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnRegisterUser"
         android:layout_width="match_parent"
