@@ -13,41 +13,50 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuth
 
 class LoginActivity : AppCompatActivity() {
-    private val defaultUser = "admin"
-    private val defaultPassword = "1234"
     private val RC_SIGN_IN = 9001
     private lateinit var mGoogleSignInClient: GoogleSignInClient
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Speak2ReadPrefs.applySettings(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
+        auth = FirebaseAuth.getInstance()
+
         // Configure Google Sign In
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
-            .requestIdToken(getString(R.string.default_web_client_id)) // Agregado para evitar Error 10
+            .requestIdToken(getString(R.string.default_web_client_id)) 
             .build()
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
 
-        val etUsername = findViewById<EditText>(R.id.etUsername)
+        val etEmail = findViewById<EditText>(R.id.etUsername) // Reutilizamos el ID anterior para el correo
         val etPassword = findViewById<EditText>(R.id.etPassword)
         val btnLogin = findViewById<Button>(R.id.btnLogin)
         val btnRegister = findViewById<Button>(R.id.btnRegister)
         val btnGoogle = findViewById<SignInButton>(R.id.btnGoogleLogin)
 
         btnLogin.setOnClickListener {
-            val username = etUsername.text.toString().trim()
+            val email = etEmail.text.toString().trim()
             val password = etPassword.text.toString()
 
-            if (username == defaultUser && password == defaultPassword) {
-                Speak2ReadPrefs.setLoggedUser(this, "Admin", "Sordo")
-                startActivity(Intent(this, HomeActivity::class.java))
-                finish()
+            if (email.isNotEmpty() && password.isNotEmpty()) {
+                auth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            Speak2ReadPrefs.setLoggedUser(this, email.split("@")[0], "Sordo")
+                            startActivity(Intent(this, HomeActivity::class.java))
+                            finish()
+                        } else {
+                            Toast.makeText(this, "Error: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
             } else {
-                Toast.makeText(this, getString(R.string.login_error_invalid), Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Completa todos los campos", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -72,7 +81,6 @@ class LoginActivity : AppCompatActivity() {
     private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) {
         try {
             val account = completedTask.getResult(ApiException::class.java)
-            // Signed in successfully
             val name = account?.displayName ?: "Usuario Google"
             Speak2ReadPrefs.setLoggedUser(this, name, "Sordo")
             startActivity(Intent(this, HomeActivity::class.java))
