@@ -28,6 +28,7 @@ class LoginActivity : AppCompatActivity() {
         // Configure Google Sign In
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
+            .requestIdToken(getString(R.string.default_web_client_id)) // Agregado para evitar Error 10
             .build()
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
 
