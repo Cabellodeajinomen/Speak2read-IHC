@@ -12,19 +12,21 @@ import androidx.room.Room
 import com.example.speak2read.database.Speak2ReadDatabase
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.switchmaterial.SwitchMaterial
+import com.google.firebase.auth.FirebaseAuth
 
 class SettingsActivity : AppCompatActivity() {
 
     private val prefsName = "s2r_settings"
     private lateinit var bottomNav: BottomNavigationView
     private lateinit var database: Speak2ReadDatabase
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Speak2ReadPrefs.applySettings(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
+        auth = FirebaseAuth.getInstance()
         database = Room.databaseBuilder(applicationContext, Speak2ReadDatabase::class.java, "speak2read_db")
             .allowMainThreadQueries()
             .fallbackToDestructiveMigration()
@@ -46,6 +48,7 @@ class SettingsActivity : AppCompatActivity() {
 
         // Alarm detection (Switch makes sense here)
         val swAlarmDetection = findViewById<SwitchMaterial>(R.id.swAlarmDetection)
+        val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
         swAlarmDetection.isChecked = prefs.getBoolean("alarm_detection", true)
         swAlarmDetection.setOnCheckedChangeListener { _, isChecked ->
             prefs.edit().putBoolean("alarm_detection", isChecked).apply()
@@ -172,7 +175,8 @@ class SettingsActivity : AppCompatActivity() {
             .setTitle(R.string.settings_clear_history)
             .setMessage(R.string.settings_clear_history_confirm)
             .setPositiveButton("Borrar") { _, _ ->
-                database.messageDao().clear()
+                val userId = auth.currentUser?.uid ?: "guest"
+                database.messageDao().clear(userId)
                 Toast.makeText(this, "Historial borrado", Toast.LENGTH_SHORT).show()
             }
             .setNegativeButton("Cancelar", null)
@@ -184,6 +188,8 @@ class SettingsActivity : AppCompatActivity() {
             .setTitle(getString(R.string.dialog_logout_title))
             .setMessage(getString(R.string.dialog_logout_message))
             .setPositiveButton(getString(R.string.dialog_accept)) { _, _ ->
+                auth.signOut() // Real Firebase Logout
+                Speak2ReadPrefs.clearSession(this)
                 val loginIntent = Intent(this, LoginActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 }
