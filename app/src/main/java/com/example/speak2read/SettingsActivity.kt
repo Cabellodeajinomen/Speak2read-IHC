@@ -1,6 +1,5 @@
 package com.example.speak2read
 
-import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
@@ -8,11 +7,11 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.room.Room
 import com.example.speak2read.database.Speak2ReadDatabase
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.switchmaterial.SwitchMaterial
-import androidx.appcompat.app.AppCompatActivity
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -33,27 +32,23 @@ class SettingsActivity : AppCompatActivity() {
 
         findViewById<TextView>(R.id.tvUserName).text = Speak2ReadPrefs.currentUserName(this)
 
-        val swFontSize = findViewById<SwitchMaterial>(R.id.swFontSize)
-        val swAlarmDetection = findViewById<SwitchMaterial>(R.id.swAlarmDetection)
-        val swTheme = findViewById<SwitchMaterial>(R.id.swTheme)
+        updateStatusLabels()
 
-        // Initialize state
-        swFontSize.isChecked = prefs.getBoolean("font_size_large", true)
-        swAlarmDetection.isChecked = prefs.getBoolean("alarm_detection", true)
-        swTheme.isChecked = prefs.getBoolean("dark_theme", true)
-
-        swFontSize.setOnCheckedChangeListener { _, isChecked ->
-            prefs.edit().putBoolean("font_size_large", isChecked).apply()
-            recreate() // Reiniciar para aplicar escala de fuente
+        // Font Size selection
+        findViewById<LinearLayout>(R.id.btnFontSizeLayout).setOnClickListener {
+            showFontSizeDialog()
         }
 
+        // Theme selection
+        findViewById<LinearLayout>(R.id.btnThemeLayout).setOnClickListener {
+            showThemeDialog()
+        }
+
+        // Alarm detection (Switch makes sense here)
+        val swAlarmDetection = findViewById<SwitchMaterial>(R.id.swAlarmDetection)
+        swAlarmDetection.isChecked = prefs.getBoolean("alarm_detection", true)
         swAlarmDetection.setOnCheckedChangeListener { _, isChecked ->
             prefs.edit().putBoolean("alarm_detection", isChecked).apply()
-        }
-
-        swTheme.setOnCheckedChangeListener { _, isChecked ->
-            prefs.edit().putBoolean("dark_theme", isChecked).apply()
-            Speak2ReadPrefs.applySettings(this) // Cambiar tema globalmente
         }
 
         // Professional layout buttons
@@ -72,12 +67,46 @@ class SettingsActivity : AppCompatActivity() {
         bottomNav = findViewById(R.id.bottom_navigation)
         bottomNav.selectedItemId = R.id.nav_settings
         setupBottomNavigation()
-        applyFontScale()
     }
 
-    private fun applyFontScale() {
-        val scale = Speak2ReadPrefs.fontScale(this)
-        findViewById<TextView>(R.id.tvUserName).textSize = 20f * scale
+    private fun updateStatusLabels() {
+        val isLarge = Speak2ReadPrefs.isLargeFont(this)
+        findViewById<TextView>(R.id.tvFontSizeStatus).text = if (isLarge) "Grande" else "Normal"
+        
+        val isDark = Speak2ReadPrefs.isDarkTheme(this)
+        findViewById<TextView>(R.id.tvThemeStatus).text = if (isDark) "Oscuro" else "Claro"
+    }
+
+    private fun showFontSizeDialog() {
+        val options = arrayOf("Normal", "Grande")
+        val current = if (Speak2ReadPrefs.isLargeFont(this)) 1 else 0
+        
+        AlertDialog.Builder(this)
+            .setTitle("Tamaño de fuente")
+            .setSingleChoiceItems(options, current) { dialog, which ->
+                val isLarge = which == 1
+                getSharedPreferences(prefsName, MODE_PRIVATE).edit()
+                    .putBoolean("font_size_large", isLarge).apply()
+                dialog.dismiss()
+                recreate()
+            }
+            .show()
+    }
+
+    private fun showThemeDialog() {
+        val options = arrayOf("Claro", "Oscuro")
+        val current = if (Speak2ReadPrefs.isDarkTheme(this)) 1 else 0
+        
+        AlertDialog.Builder(this)
+            .setTitle("Seleccionar Tema")
+            .setSingleChoiceItems(options, current) { dialog, which ->
+                val isDark = which == 1
+                getSharedPreferences(prefsName, MODE_PRIVATE).edit()
+                    .putBoolean("dark_theme", isDark).apply()
+                dialog.dismiss()
+                Speak2ReadPrefs.applySettings(this)
+            }
+            .show()
     }
 
     private fun setupBottomNavigation() {

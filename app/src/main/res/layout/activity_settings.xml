@@ -40,7 +40,8 @@
                     app:shapeAppearanceOverlay="@style/CircleImage"
                     android:background="@color/s2r_surface"
                     android:padding="12dp"
-                    app:tint="@color/s2r_accent"/>
+                    app:tint="@color/s2r_accent"
+                    android:contentDescription="Perfil"/>
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -88,61 +89,87 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <!-- Font Size -->
+                    <!-- Font Size Selection -->
                     <LinearLayout
+                        android:id="@+id/btnFontSizeLayout"
                         android:layout_width="match_parent"
                         android:layout_height="64dp"
                         android:gravity="center_vertical"
-                        android:paddingHorizontal="16dp">
+                        android:paddingHorizontal="16dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground">
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@android:drawable/ic_menu_sort_alphabetically"
-                            app:tint="@color/s2r_text_secondary"/>
-                        <TextView
+                            app:tint="@color/s2r_text_secondary"
+                            android:contentDescription="Fuente"/>
+                        <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:layout_marginStart="16dp"
-                            android:text="@string/switch_tamano_letra"
-                            android:textColor="@color/s2r_text_primary"
-                            android:textSize="16sp" />
-                        <com.google.android.material.switchmaterial.SwitchMaterial
-                            android:id="@+id/swFontSize"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                            android:orientation="vertical"
+                            android:layout_marginStart="16dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/switch_tamano_letra"
+                                android:textColor="@color/s2r_text_primary"
+                                android:textSize="16sp" />
+                            <TextView
+                                android:id="@+id/tvFontSizeStatus"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Normal"
+                                android:textColor="@color/s2r_text_secondary"
+                                android:textSize="13sp" />
+                        </LinearLayout>
                     </LinearLayout>
 
                     <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/s2r_background" android:layout_marginHorizontal="16dp"/>
 
-                    <!-- Dark Theme -->
+                    <!-- Theme Selection -->
                     <LinearLayout
+                        android:id="@+id/btnThemeLayout"
                         android:layout_width="match_parent"
                         android:layout_height="64dp"
                         android:gravity="center_vertical"
-                        android:paddingHorizontal="16dp">
+                        android:paddingHorizontal="16dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground">
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@android:drawable/ic_menu_day"
-                            app:tint="@color/s2r_text_secondary"/>
-                        <TextView
+                            app:tint="@color/s2r_text_secondary"
+                            android:contentDescription="Tema"/>
+                        <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:layout_marginStart="16dp"
-                            android:text="@string/switch_cambiar_tema"
-                            android:textColor="@color/s2r_text_primary"
-                            android:textSize="16sp" />
-                        <com.google.android.material.switchmaterial.SwitchMaterial
-                            android:id="@+id/swTheme"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                            android:orientation="vertical"
+                            android:layout_marginStart="16dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/switch_cambiar_tema"
+                                android:textColor="@color/s2r_text_primary"
+                                android:textSize="16sp" />
+                            <TextView
+                                android:id="@+id/tvThemeStatus"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Oscuro"
+                                android:textColor="@color/s2r_text_secondary"
+                                android:textSize="13sp" />
+                        </LinearLayout>
                     </LinearLayout>
 
                     <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/s2r_background" android:layout_marginHorizontal="16dp"/>
 
-                    <!-- Alarms -->
+                    <!-- Alarms (Keep as switch) -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="64dp"
@@ -152,7 +179,8 @@
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@android:drawable/ic_lock_silent_mode_off"
-                            app:tint="@color/s2r_text_secondary"/>
+                            app:tint="@color/s2r_text_secondary"
+                            android:contentDescription="Alarmas"/>
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -183,7 +211,8 @@
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@android:drawable/ic_menu_edit"
-                            app:tint="@color/s2r_text_secondary"/>
+                            app:tint="@color/s2r_text_secondary"
+                            android:contentDescription="Editar"/>
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -234,7 +263,8 @@
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@android:drawable/ic_menu_delete"
-                            app:tint="@color/s2r_text_secondary"/>
+                            app:tint="@color/s2r_text_secondary"
+                            android:contentDescription="Borrar"/>
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -260,7 +290,8 @@
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@android:drawable/ic_lock_power_off"
-                            app:tint="@color/s2r_alert"/>
+                            app:tint="@color/s2r_alert"
+                            android:contentDescription="Salir"/>
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
