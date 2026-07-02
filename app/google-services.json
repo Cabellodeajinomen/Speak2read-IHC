@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "598440352422",
+    "project_id": "speak2read-11d9f",
+    "storage_bucket": "speak2read-11d9f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:598440352422:android:e9cbb507930b7811717267",
+        "android_client_info": {
+          "package_name": "com.example.speak2read"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9YOZFwRmM4mlsLwS34FPynqbzQu1WkMI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -53,6 +54,11 @@ dependencies {
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.gridlayout:gridlayout:1.0.0")
     implementation("com.google.android.gms:play-services-auth:21.3.0")
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.auth)
 
     // Room
     val room_version = "2.6.1"
