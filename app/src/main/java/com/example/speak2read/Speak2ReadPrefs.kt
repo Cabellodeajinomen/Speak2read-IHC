@@ -60,7 +60,7 @@ object Speak2ReadPrefs {
 
     fun isLargeFont(context: Context): Boolean = settings(context).getBoolean(KEY_FONT_SIZE_LARGE, false)
     fun isAlarmDetectionEnabled(context: Context): Boolean = settings(context).getBoolean(KEY_ALARM_DETECTION, true)
-    fun isDarkTheme(context: Context): Boolean = settings(context).getBoolean(KEY_DARK_THEME, true)
+    fun isDarkTheme(context: Context): Boolean = settings(context).getBoolean(KEY_DARK_THEME, false)
 
     fun fontScale(context: Context): Float = if (isLargeFont(context)) 1.25f else 1.0f
 
