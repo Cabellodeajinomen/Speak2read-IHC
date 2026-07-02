@@ -15,6 +15,7 @@ import com.example.speak2read.database.Speak2ReadDatabase
 import com.example.speak2read.model.ChatMessage
 import com.example.speak2read.model.MessageType
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth
 import java.util.Locale
 import androidx.appcompat.app.AppCompatActivity
 
@@ -25,6 +26,7 @@ class FavoritesActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private lateinit var adapter: ChatAdapter
     private lateinit var bottomNav: BottomNavigationView
     private lateinit var database: Speak2ReadDatabase
+    private lateinit var auth: FirebaseAuth
     private var tts: TextToSpeech? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,17 +34,14 @@ class FavoritesActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_favorites)
 
+        auth = FirebaseAuth.getInstance()
         tts = TextToSpeech(this, this)
         rvFavorites = findViewById(R.id.recyclerFavorites)
         emptyState = findViewById(R.id.emptyStateFavorites)
         bottomNav = findViewById(R.id.bottom_navigation)
         bottomNav.selectedItemId = R.id.nav_favorites
 
-        database = Room.databaseBuilder(
-            applicationContext,
-            Speak2ReadDatabase::class.java,
-            "speak2read_db"
-        )
+        database = Room.databaseBuilder(applicationContext, Speak2ReadDatabase::class.java, "speak2read_db")
             .allowMainThreadQueries()
             .fallbackToDestructiveMigration()
             .build()
@@ -57,47 +56,25 @@ class FavoritesActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
         loadFavorites()
         setupBottomNavigation()
-        applyFontScale()
-    }
-
-    private fun applyFontScale() {
-        val scale = Speak2ReadPrefs.fontScale(this)
-        // Adjust any UI elements in favorites if needed
     }
 
     private fun setupBottomNavigation() {
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_home -> {
-                    startActivity(Intent(this, HomeActivity::class.java))
-                    finish()
-                    true
-                }
-                R.id.nav_conversations -> {
-                    startActivity(Intent(this, ConversationsActivity::class.java))
-                    finish()
-                    true
-                }
+                R.id.nav_home -> { startActivity(Intent(this, HomeActivity::class.java)); finish(); true }
+                R.id.nav_conversations -> { startActivity(Intent(this, ConversationsActivity::class.java)); finish(); true }
                 R.id.nav_favorites -> true
-                R.id.nav_settings -> {
-                    startActivity(Intent(this, SettingsActivity::class.java))
-                    false
-                }
+                R.id.nav_settings -> { startActivity(Intent(this, SettingsActivity::class.java)); false }
                 else -> false
             }
         }
     }
 
     private fun loadFavorites() {
-        val favorites = database.messageDao().getFavorites()
+        val userId = auth.currentUser?.uid ?: "guest"
+        val favorites = database.messageDao().getFavorites(userId)
         val chatMessages = favorites.map {
-            ChatMessage(
-                id = it.id,
-                text = it.text,
-                type = if (it.type == "SEND") MessageType.SEND else MessageType.RECEIVE,
-                timestamp = it.timestamp,
-                isFavorite = it.isFavorite
-            )
+            ChatMessage(id = it.id, text = it.text, type = if (it.type == "SEND") MessageType.SEND else MessageType.RECEIVE, timestamp = it.timestamp, isFavorite = it.isFavorite)
         }
         adapter.submitMessages(chatMessages)
         

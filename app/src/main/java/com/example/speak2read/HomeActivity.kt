@@ -35,6 +35,7 @@ import androidx.room.Room
 import com.example.speak2read.database.ChatMessageEntity
 import com.example.speak2read.database.Speak2ReadDatabase
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
 import java.util.Date
 import androidx.appcompat.app.AppCompatActivity
@@ -57,6 +58,9 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private lateinit var bottomNav: BottomNavigationView
 
     private lateinit var database: Speak2ReadDatabase
+    private lateinit var auth: FirebaseAuth
+    private var currentUserId: String = "guest"
+    
     private var listening = false
     private var tts: TextToSpeech? = null
     private var micPulse: ObjectAnimator? = null
@@ -79,6 +83,9 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         window.setDecorFitsSystemWindows(true)
         setContentView(R.layout.activity_home)
 
+        auth = FirebaseAuth.getInstance()
+        currentUserId = auth.currentUser?.uid ?: "guest"
+
         tts = TextToSpeech(this, this)
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
 
@@ -96,11 +103,7 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         btnSosHeader = findViewById(R.id.btnSosHeader)
         bottomNav = findViewById(R.id.bottom_navigation)
 
-        database = Room.databaseBuilder(
-            applicationContext,
-            Speak2ReadDatabase::class.java,
-            "speak2read_db"
-        )
+        database = Room.databaseBuilder(applicationContext, Speak2ReadDatabase::class.java, "speak2read_db")
             .allowMainThreadQueries()
             .fallbackToDestructiveMigration()
             .build()
@@ -118,31 +121,15 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         loadMessages()
 
         // Quick replies clicks
-        findViewById<View>(R.id.qr_si).setOnClickListener {
-            sendQuickReply(findViewById<TextView>(R.id.tvQr1).text.toString())
-        }
-        findViewById<View>(R.id.qr_no).setOnClickListener {
-            sendQuickReply(findViewById<TextView>(R.id.tvQr2).text.toString())
-        }
-        findViewById<View>(R.id.qr_repite).setOnClickListener {
-            sendQuickReply(findViewById<TextView>(R.id.tvQr3).text.toString())
-        }
-        findViewById<View>(R.id.qr_ayuda).setOnClickListener {
-            sendQuickReply(findViewById<TextView>(R.id.tvQr4).text.toString())
-        }
+        findViewById<View>(R.id.qr_si).setOnClickListener { sendQuickReply(findViewById<TextView>(R.id.tvQr1).text.toString()) }
+        findViewById<View>(R.id.qr_no).setOnClickListener { sendQuickReply(findViewById<TextView>(R.id.tvQr2).text.toString()) }
+        findViewById<View>(R.id.qr_repite).setOnClickListener { sendQuickReply(findViewById<TextView>(R.id.tvQr3).text.toString()) }
+        findViewById<View>(R.id.qr_ayuda).setOnClickListener { sendQuickReply(findViewById<TextView>(R.id.tvQr4).text.toString()) }
 
-        // SOS Button Header
-        btnSosHeader.setOnClickListener {
-            showSosConfirmation()
-        }
-
-        // Context Initial load
+        btnSosHeader.setOnClickListener { showSosConfirmation() }
         updateQuickReplies(Speak2ReadPrefs.getCurrentContext(this))
 
-        // Settings Button
-        findViewById<ImageButton>(R.id.btnSettings).setOnClickListener {
-            startActivity(Intent(this, SettingsActivity::class.java))
-        }
+        findViewById<ImageButton>(R.id.btnSettings).setOnClickListener { startActivity(Intent(this, SettingsActivity::class.java)) }
 
         // Context Buttons
         findViewById<Button>(R.id.btnHospital).setOnClickListener { setAppContext("HOSPITAL") }
@@ -186,9 +173,7 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         }
 
         // My Messages
-        btnSpeaker.setOnClickListener {
-            speakText(etMessage.text.toString())
-        }
+        btnSpeaker.setOnClickListener { speakText(etMessage.text.toString()) }
 
         btnSendMessage.setOnClickListener {
             val text = etMessage.text.toString().trim()
@@ -212,8 +197,6 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         val scale = Speak2ReadPrefs.fontScale(this)
         etTranscription.textSize = 22f * scale
         etMessage.textSize = 16f * scale
-        
-        // Also apply to quick reply buttons if needed
         findViewById<TextView>(R.id.tvQr1).textSize = 14f * scale
         findViewById<TextView>(R.id.tvQr2).textSize = 14f * scale
         findViewById<TextView>(R.id.tvQr3).textSize = 14f * scale
@@ -224,20 +207,9 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_home -> true
-                R.id.nav_conversations -> {
-                    startActivity(Intent(this, ConversationsActivity::class.java))
-                    finish()
-                    true
-                }
-                R.id.nav_favorites -> {
-                    startActivity(Intent(this, FavoritesActivity::class.java))
-                    finish()
-                    true
-                }
-                R.id.nav_settings -> {
-                    startActivity(Intent(this, SettingsActivity::class.java))
-                    false 
-                }
+                R.id.nav_conversations -> { startActivity(Intent(this, ConversationsActivity::class.java)); finish(); true }
+                R.id.nav_favorites -> { startActivity(Intent(this, FavoritesActivity::class.java)); finish(); true }
+                R.id.nav_settings -> { startActivity(Intent(this, SettingsActivity::class.java)); false }
                 else -> false
             }
         }
@@ -274,20 +246,11 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             override fun onBeginningOfSpeech() {}
             override fun onRmsChanged(rmsdB: Float) {}
             override fun onBufferReceived(buffer: ByteArray?) {}
-            override fun onEndOfSpeech() {
-                stopMicPulse()
-                listening = false
-            }
-            override fun onError(error: Int) {
-                stopMicPulse()
-                listening = false
-                Toast.makeText(this@HomeActivity, "Error STT: $error", Toast.LENGTH_LONG).show()
-            }
+            override fun onEndOfSpeech() { stopMicPulse(); listening = false }
+            override fun onError(error: Int) { stopMicPulse(); listening = false; Toast.makeText(this@HomeActivity, "Error STT: $error", Toast.LENGTH_LONG).show() }
             override fun onResults(results: Bundle?) {
                 val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-                if (!matches.isNullOrEmpty()) {
-                    etTranscription.setText(matches[0])
-                }
+                if (!matches.isNullOrEmpty()) etTranscription.setText(matches[0])
             }
             override fun onPartialResults(partialResults: Bundle?) {}
             override fun onEvent(eventType: Int, params: Bundle?) {}
@@ -313,22 +276,16 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
     private fun addMessage(text: String, type: MessageType) {
         val time = SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date())
-        val entity = ChatMessageEntity(text = text, type = type.name, timestamp = time)
+        val entity = ChatMessageEntity(userId = currentUserId, text = text, type = type.name, timestamp = time)
         val id = database.messageDao().insert(entity).toInt()
         adapter.addMessage(ChatMessage(id = id, text = text, type = type, timestamp = time))
         rvChat.scrollToPosition(adapter.itemCount - 1)
     }
 
     private fun loadMessages() {
-        val savedMessages = database.messageDao().getAll()
+        val savedMessages = database.messageDao().getAll(currentUserId)
         val chatMessages = savedMessages.map {
-            ChatMessage(
-                id = it.id,
-                text = it.text,
-                type = if (it.type == "SEND") MessageType.SEND else MessageType.RECEIVE,
-                timestamp = it.timestamp,
-                isFavorite = it.isFavorite
-            )
+            ChatMessage(id = it.id, text = it.text, type = if (it.type == "SEND") MessageType.SEND else MessageType.RECEIVE, timestamp = it.timestamp, isFavorite = it.isFavorite)
         }
         adapter.submitMessages(chatMessages)
         if (adapter.itemCount > 0) rvChat.scrollToPosition(adapter.itemCount - 1)

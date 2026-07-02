@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 data class ChatMessageEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
+    val userId: String, // ID único del usuario de Firebase
     val text: String,
     val type: String,
     val timestamp: String,

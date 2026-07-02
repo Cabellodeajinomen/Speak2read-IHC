@@ -27,6 +27,14 @@ class LoginActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
 
+        // Persistencia: Revisar si ya hay sesión activa
+        if (auth.currentUser != null) {
+            val user = auth.currentUser
+            Speak2ReadPrefs.setLoggedUser(this, user?.displayName ?: user?.email?.split("@")?.get(0) ?: "Usuario", "Sordo")
+            startActivity(Intent(this, HomeActivity::class.java))
+            finish()
+        }
+
         // Configure Google Sign In
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
