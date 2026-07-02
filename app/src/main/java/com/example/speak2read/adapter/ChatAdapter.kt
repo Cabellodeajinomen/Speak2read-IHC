@@ -7,6 +7,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.speak2read.R
+import com.example.speak2read.Speak2ReadPrefs
 import com.example.speak2read.model.ChatMessage
 import com.example.speak2read.model.MessageType
 
@@ -74,7 +75,9 @@ class ChatAdapter(
         private val btnFavorite: ImageButton = itemView.findViewById(R.id.btnFavoriteReceive)
 
         fun bind(message: ChatMessage) {
+            val scale = Speak2ReadPrefs.fontScale(itemView.context)
             tvMessage.text = message.text
+            tvMessage.textSize = 16f * scale
             tvTime.text = message.timestamp
             btnExpand.setOnClickListener { onExpandMessage(message.text) }
             btnSpeak.setOnClickListener { onSpeakMessage(message.text) }
@@ -98,7 +101,9 @@ class ChatAdapter(
         private val btnFavorite: ImageButton = itemView.findViewById(R.id.btnFavoriteSend)
 
         fun bind(message: ChatMessage) {
+            val scale = Speak2ReadPrefs.fontScale(itemView.context)
             tvMessage.text = message.text
+            tvMessage.textSize = 16f * scale
             tvTime.text = message.timestamp
             btnExpand.setOnClickListener { onExpandMessage(message.text) }
             btnSpeak.setOnClickListener { onSpeakMessage(message.text) }

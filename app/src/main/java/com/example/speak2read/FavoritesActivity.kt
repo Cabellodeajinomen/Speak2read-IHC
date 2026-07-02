@@ -16,8 +16,9 @@ import com.example.speak2read.model.ChatMessage
 import com.example.speak2read.model.MessageType
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.util.Locale
+import androidx.appcompat.app.AppCompatActivity
 
-class FavoritesActivity : Activity(), TextToSpeech.OnInitListener {
+class FavoritesActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
     private lateinit var rvFavorites: RecyclerView
     private lateinit var emptyState: LinearLayout
@@ -27,6 +28,7 @@ class FavoritesActivity : Activity(), TextToSpeech.OnInitListener {
     private var tts: TextToSpeech? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Speak2ReadPrefs.applySettings(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_favorites)
 
@@ -55,6 +57,12 @@ class FavoritesActivity : Activity(), TextToSpeech.OnInitListener {
 
         loadFavorites()
         setupBottomNavigation()
+        applyFontScale()
+    }
+
+    private fun applyFontScale() {
+        val scale = Speak2ReadPrefs.fontScale(this)
+        // Adjust any UI elements in favorites if needed
     }
 
     private fun setupBottomNavigation() {

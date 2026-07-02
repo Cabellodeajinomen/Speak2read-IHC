@@ -37,8 +37,9 @@ import com.example.speak2read.database.Speak2ReadDatabase
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.text.SimpleDateFormat
 import java.util.Date
+import androidx.appcompat.app.AppCompatActivity
 
-class HomeActivity : Activity(), TextToSpeech.OnInitListener {
+class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
     private lateinit var rvChat: RecyclerView
     private lateinit var adapter: ChatAdapter
@@ -204,6 +205,19 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
         }
 
         setupBottomNavigation()
+        applyFontScale()
+    }
+
+    private fun applyFontScale() {
+        val scale = Speak2ReadPrefs.fontScale(this)
+        etTranscription.textSize = 22f * scale
+        etMessage.textSize = 16f * scale
+        
+        // Also apply to quick reply buttons if needed
+        findViewById<TextView>(R.id.tvQr1).textSize = 14f * scale
+        findViewById<TextView>(R.id.tvQr2).textSize = 14f * scale
+        findViewById<TextView>(R.id.tvQr3).textSize = 14f * scale
+        findViewById<TextView>(R.id.tvQr4).textSize = 14f * scale
     }
 
     private fun setupBottomNavigation() {

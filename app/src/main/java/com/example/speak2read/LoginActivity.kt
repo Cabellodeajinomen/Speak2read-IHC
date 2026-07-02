@@ -6,12 +6,14 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 
-class LoginActivity : Activity() {
+class LoginActivity : AppCompatActivity() {
     private val defaultUser = "admin"
     private val defaultPassword = "1234"
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Speak2ReadPrefs.applySettings(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 

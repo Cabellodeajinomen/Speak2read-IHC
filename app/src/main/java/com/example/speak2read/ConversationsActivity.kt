@@ -4,12 +4,14 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import androidx.appcompat.app.AppCompatActivity
 
-class ConversationsActivity : Activity() {
+class ConversationsActivity : AppCompatActivity() {
 
     private lateinit var bottomNav: BottomNavigationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Speak2ReadPrefs.applySettings(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_conversations)
 

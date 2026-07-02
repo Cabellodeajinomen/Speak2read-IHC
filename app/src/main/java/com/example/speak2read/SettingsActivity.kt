@@ -12,14 +12,16 @@ import androidx.room.Room
 import com.example.speak2read.database.Speak2ReadDatabase
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.switchmaterial.SwitchMaterial
+import androidx.appcompat.app.AppCompatActivity
 
-class SettingsActivity : Activity() {
+class SettingsActivity : AppCompatActivity() {
 
     private val prefsName = "s2r_settings"
     private lateinit var bottomNav: BottomNavigationView
     private lateinit var database: Speak2ReadDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Speak2ReadPrefs.applySettings(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
@@ -70,6 +72,12 @@ class SettingsActivity : Activity() {
         bottomNav = findViewById(R.id.bottom_navigation)
         bottomNav.selectedItemId = R.id.nav_settings
         setupBottomNavigation()
+        applyFontScale()
+    }
+
+    private fun applyFontScale() {
+        val scale = Speak2ReadPrefs.fontScale(this)
+        findViewById<TextView>(R.id.tvUserName).textSize = 20f * scale
     }
 
     private fun setupBottomNavigation() {
