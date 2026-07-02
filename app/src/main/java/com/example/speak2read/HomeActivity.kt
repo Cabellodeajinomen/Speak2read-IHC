@@ -73,6 +73,7 @@ class HomeActivity : Activity(), TextToSpeech.OnInitListener {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Speak2ReadPrefs.applySettings(this)
         super.onCreate(savedInstanceState)
         window.setDecorFitsSystemWindows(true)
         setContentView(R.layout.activity_home)

@@ -58,11 +58,21 @@ object Speak2ReadPrefs {
     fun settings(context: Context) = context.getSharedPreferences(SETTINGS_PREFS, Context.MODE_PRIVATE)
     fun session(context: Context) = context.getSharedPreferences(SESSION_PREFS, Context.MODE_PRIVATE)
 
-    fun isLargeFont(context: Context): Boolean = settings(context).getBoolean(KEY_FONT_SIZE_LARGE, true)
+    fun isLargeFont(context: Context): Boolean = settings(context).getBoolean(KEY_FONT_SIZE_LARGE, false)
     fun isAlarmDetectionEnabled(context: Context): Boolean = settings(context).getBoolean(KEY_ALARM_DETECTION, true)
     fun isDarkTheme(context: Context): Boolean = settings(context).getBoolean(KEY_DARK_THEME, true)
 
-    fun fontScale(context: Context): Float = if (isLargeFont(context)) 1.18f else 1.0f
+    fun fontScale(context: Context): Float = if (isLargeFont(context)) 1.25f else 1.0f
+
+    fun applySettings(context: Context) {
+        // Aplicar Tema
+        val mode = if (isDarkTheme(context)) {
+            androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
+        } else {
+            androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
+        }
+        androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(mode)
+    }
 
     fun setLoggedUser(context: Context, name: String, type: String) {
         session(context).edit()

@@ -25,6 +25,44 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+            <!-- Profile Header -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="32dp"
+                android:layout_marginTop="8dp">
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@android:drawable/ic_menu_gallery"
+                    app:shapeAppearanceOverlay="@style/CircleImage"
+                    android:background="@color/s2r_surface"
+                    android:padding="12dp"
+                    app:tint="@color/s2r_accent"/>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginStart="16dp">
+                    <TextView
+                        android:id="@+id/tvUserName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Usuario Admin"
+                        android:textColor="@color/s2r_text_primary"
+                        android:textSize="20sp"
+                        android:textStyle="bold"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Perfil de Usuario Sordo"
+                        android:textColor="@color/s2r_text_secondary"
+                        android:textSize="14sp"/>
+                </LinearLayout>
+            </LinearLayout>
+
             <!-- Category: General -->
             <TextView
                 android:layout_width="wrap_content"

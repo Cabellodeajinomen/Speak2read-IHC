@@ -9,4 +9,8 @@
         <item name="android:textColorPrimary">@color/s2r_text_primary</item>
         <item name="android:textColor">@color/s2r_text_primary</item>
     </style>
+
+    <style name="CircleImage">
+        <item name="cornerSize">50%</item>
+    </style>
 </resources>

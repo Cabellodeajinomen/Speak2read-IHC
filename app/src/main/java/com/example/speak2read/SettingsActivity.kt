@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.room.Room
 import com.example.speak2read.database.Speak2ReadDatabase
@@ -28,6 +29,8 @@ class SettingsActivity : Activity() {
             .fallbackToDestructiveMigration()
             .build()
 
+        findViewById<TextView>(R.id.tvUserName).text = Speak2ReadPrefs.currentUserName(this)
+
         val swFontSize = findViewById<SwitchMaterial>(R.id.swFontSize)
         val swAlarmDetection = findViewById<SwitchMaterial>(R.id.swAlarmDetection)
         val swTheme = findViewById<SwitchMaterial>(R.id.swTheme)
@@ -39,7 +42,7 @@ class SettingsActivity : Activity() {
 
         swFontSize.setOnCheckedChangeListener { _, isChecked ->
             prefs.edit().putBoolean("font_size_large", isChecked).apply()
-            Toast.makeText(this, "El tamaño de fuente se aplicará al reiniciar", Toast.LENGTH_SHORT).show()
+            recreate() // Reiniciar para aplicar escala de fuente
         }
 
         swAlarmDetection.setOnCheckedChangeListener { _, isChecked ->
@@ -48,7 +51,7 @@ class SettingsActivity : Activity() {
 
         swTheme.setOnCheckedChangeListener { _, isChecked ->
             prefs.edit().putBoolean("dark_theme", isChecked).apply()
-            Toast.makeText(this, "Reinicia la app para cambiar el tema", Toast.LENGTH_SHORT).show()
+            Speak2ReadPrefs.applySettings(this) // Cambiar tema globalmente
         }
 
         // Professional layout buttons

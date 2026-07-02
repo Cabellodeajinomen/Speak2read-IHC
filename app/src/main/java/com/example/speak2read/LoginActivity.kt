@@ -25,6 +25,7 @@ class LoginActivity : Activity() {
             val password = etPassword.text.toString()
 
             if (username == defaultUser && password == defaultPassword) {
+                Speak2ReadPrefs.setLoggedUser(this, "Admin", "Sordo")
                 startActivity(Intent(this, HomeActivity::class.java))
                 finish()
             } else {
