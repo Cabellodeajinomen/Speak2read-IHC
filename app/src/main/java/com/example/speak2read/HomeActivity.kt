@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.view.View
@@ -50,9 +51,12 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private lateinit var btnMicTranscription: ImageButton
     private lateinit var btnFullscreenTranscription: ImageButton
     private lateinit var btnSendTranscription: ImageButton
+    private lateinit var btnSelectContact: ImageButton
     private lateinit var btnSendMessage: ImageButton
     private lateinit var btnAcknowledge: android.widget.Button
     private lateinit var emergencyOverlay: View
+    private lateinit var tvEmergencyTitle: TextView
+    private lateinit var tvEmergencyType: TextView
     private lateinit var imgWarning: ImageView
     private lateinit var btnSosHeader: View
     private lateinit var bottomNav: BottomNavigationView
@@ -60,6 +64,7 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private lateinit var database: Speak2ReadDatabase
     private lateinit var auth: FirebaseAuth
     private var currentUserId: String = "guest"
+    private var currentContact: String? = null
     
     private var listening = false
     private var tts: TextToSpeech? = null
@@ -67,13 +72,14 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private var speechRecognizer: SpeechRecognizer? = null
     private val REQUEST_RECORD_AUDIO = 100
 
-    private val emergencyAction = "com.example.speak2read.ACTION_EMERGENCY"
+    private val emergencyAction = "com.example.speak2read.ACTION_SOUND_DETECTED"
     private var receiverRegistered = false
 
     private val emergencyReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            emergencyOverlay.visibility = View.VISIBLE
-            startWarningBlink()
+            val soundType = intent?.getStringExtra("extra_sound_type") ?: "Alarma detectada"
+            val confidence = intent?.getIntExtra("extra_confidence", 0) ?: 0
+            showEmergencyOverlay(soundType, confidence)
         }
     }
 
@@ -97,7 +103,10 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         btnFullscreenTranscription = findViewById(R.id.btnFullscreenTranscription)
         btnSendTranscription = findViewById(R.id.btnSendTranscription)
         btnSendMessage = findViewById(R.id.btnSendMessage)
+        btnSelectContact = findViewById(R.id.btnSelectContact)
         emergencyOverlay = findViewById(R.id.emergencyOverlay)
+        tvEmergencyTitle = findViewById(R.id.tvEmergencyTitle)
+        tvEmergencyType = findViewById(R.id.tvEmergencyType)
         btnAcknowledge = findViewById(R.id.btnAcknowledge)
         imgWarning = findViewById(R.id.imgWarning)
         btnSosHeader = findViewById(R.id.btnSosHeader)
@@ -130,6 +139,7 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         updateQuickReplies(Speak2ReadPrefs.getCurrentContext(this))
 
         findViewById<ImageButton>(R.id.btnSettings).setOnClickListener { startActivity(Intent(this, SettingsActivity::class.java)) }
+        btnSelectContact.setOnClickListener { showContactDialog() }
 
         // Context Buttons
         findViewById<Button>(R.id.btnHospital).setOnClickListener { setAppContext("HOSPITAL") }
@@ -187,10 +197,26 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         btnAcknowledge.setOnClickListener {
             emergencyOverlay.visibility = View.GONE
             stopWarningBlink()
+            val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as android.os.Vibrator
+            vibrator.cancel()
         }
 
         setupBottomNavigation()
         applyFontScale()
+
+        if (Speak2ReadPrefs.isAlarmDetectionEnabled(this)) {
+            checkAndStartSoundService()
+        }
+    }
+
+    private fun checkAndStartSoundService() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+            val intent = Intent(this, com.example.speak2read.service.SoundDetectionService::class.java)
+            startForegroundService(intent)
+        } else {
+            // Si no hay permiso, lo pedimos. El servicio se iniciará tras aceptar.
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), REQUEST_RECORD_AUDIO)
+        }
     }
 
     private fun applyFontScale() {
@@ -247,7 +273,19 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             override fun onRmsChanged(rmsdB: Float) {}
             override fun onBufferReceived(buffer: ByteArray?) {}
             override fun onEndOfSpeech() { stopMicPulse(); listening = false }
-            override fun onError(error: Int) { stopMicPulse(); listening = false; Toast.makeText(this@HomeActivity, "Error STT: $error", Toast.LENGTH_LONG).show() }
+            override fun onError(error: Int) {
+                stopMicPulse()
+                listening = false
+                val message = when (error) {
+                    SpeechRecognizer.ERROR_NO_MATCH -> "No se escuchó nada claro, ¿puedes repetir?"
+                    SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "No detecté sonido, intenta hablar más fuerte."
+                    SpeechRecognizer.ERROR_NETWORK -> "Problema de conexión, revisa tu internet."
+                    SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> "El sistema está ocupado, espera un segundo."
+                    SpeechRecognizer.ERROR_AUDIO -> "Error de audio, intenta de nuevo."
+                    else -> "No pude escucharte bien, inténtalo otra vez."
+                }
+                Toast.makeText(this@HomeActivity, message, Toast.LENGTH_SHORT).show()
+            }
             override fun onResults(results: Bundle?) {
                 val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
                 if (!matches.isNullOrEmpty()) etTranscription.setText(matches[0])
@@ -260,7 +298,14 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_RECORD_AUDIO && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            btnMicTranscription.performClick()
+            // Re-intentar iniciar servicio si el permiso fue concedido
+            if (Speak2ReadPrefs.isAlarmDetectionEnabled(this)) {
+                checkAndStartSoundService()
+            }
+            // También para el botón del micrófono si estaba esperando
+            if (listening) {
+                btnMicTranscription.performClick()
+            }
         }
     }
 
@@ -274,18 +319,76 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         super.onStop()
     }
 
+    private fun showContactDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_select_contact, null)
+        val tietName = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.tietContactName)
+        val btnSave = dialogView.findViewById<Button>(R.id.btnSaveContact)
+        val btnCancel = dialogView.findViewById<Button>(R.id.btnCancelContact)
+        
+        tietName.setText(currentContact)
+        
+        val alertDialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
+            
+        // Ajustar fondo transparente para que se vea el corner radius si el layout lo tiene
+        alertDialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        btnSave.setOnClickListener {
+            val name = tietName.text.toString().trim()
+            currentContact = if (name.isNotEmpty()) name else null
+            
+            val msg = if (currentContact != null) 
+                getString(R.string.contact_mode_speaking_with, currentContact) 
+            else 
+                getString(R.string.contact_mode_general)
+            
+            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+            alertDialog.dismiss()
+        }
+        
+        btnCancel.setOnClickListener {
+            alertDialog.dismiss()
+        }
+        
+        alertDialog.show()
+    }
+
     private fun addMessage(text: String, type: MessageType) {
         val time = SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date())
-        val entity = ChatMessageEntity(userId = currentUserId, text = text, type = type.name, timestamp = time)
+        val category = Speak2ReadPrefs.getCurrentContext(this)
+        val entity = ChatMessageEntity(
+            userId = currentUserId,
+            text = text,
+            type = type.name,
+            timestamp = time,
+            category = category,
+            contactName = currentContact
+        )
         val id = database.messageDao().insert(entity).toInt()
-        adapter.addMessage(ChatMessage(id = id, text = text, type = type, timestamp = time))
+        adapter.addMessage(ChatMessage(
+            id = id,
+            text = text,
+            type = type,
+            timestamp = time,
+            category = category,
+            contactName = currentContact
+        ))
         rvChat.scrollToPosition(adapter.itemCount - 1)
     }
 
     private fun loadMessages() {
         val savedMessages = database.messageDao().getAll(currentUserId)
         val chatMessages = savedMessages.map {
-            ChatMessage(id = it.id, text = it.text, type = if (it.type == "SEND") MessageType.SEND else MessageType.RECEIVE, timestamp = it.timestamp, isFavorite = it.isFavorite)
+            ChatMessage(
+                id = it.id,
+                text = it.text,
+                type = if (it.type == "SEND") MessageType.SEND else MessageType.RECEIVE,
+                timestamp = it.timestamp,
+                isFavorite = it.isFavorite,
+                category = it.category,
+                contactName = it.contactName
+            )
         }
         adapter.submitMessages(chatMessages)
         if (adapter.itemCount > 0) rvChat.scrollToPosition(adapter.itemCount - 1)
@@ -303,6 +406,31 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         speechRecognizer?.destroy()
         tts?.stop()
         tts?.shutdown()
+    }
+
+    private fun showEmergencyOverlay(soundType: String, confidence: Int) {
+        val displayType = when(soundType) {
+            "SIRENA" -> getString(R.string.emergency_type_siren)
+            "INCENDIO" -> getString(R.string.emergency_type_fire)
+            "BOCINA" -> getString(R.string.emergency_type_horn)
+            "HUMO" -> getString(R.string.emergency_type_smoke)
+            "LLANTO" -> getString(R.string.emergency_type_baby)
+            "TIMBRE" -> getString(R.string.emergency_type_doorbell)
+            else -> soundType
+        }
+        
+        tvEmergencyType.text = "$displayType\n($confidence%)"
+        emergencyOverlay.visibility = View.VISIBLE
+        
+        // Vibración para alertar al usuario
+        val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as android.os.Vibrator
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibrator.vibrate(android.os.VibrationEffect.createWaveform(longArrayOf(0, 500, 200, 500), 0))
+        } else {
+            vibrator.vibrate(longArrayOf(0, 500, 200, 500), 0)
+        }
+        
+        startWarningBlink()
     }
 
     private fun registerEmergencyReceiverIfNeeded() {

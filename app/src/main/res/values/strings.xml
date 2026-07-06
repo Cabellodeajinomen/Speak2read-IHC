@@ -26,6 +26,7 @@
     <string name="login_btn_entrar">Entrar</string>
     <string name="login_btn_guest">Continuar como invitado</string>
     <string name="login_btn_register">Registrarse</string>
+    <string name="default_web_client_id">598440352422-qbe21f4vo54li0dapjlhjqgoh78nu4q6.apps.googleusercontent.com</string>
     <string name="login_default_credentials">Demo: usuario admin / clave 1234</string>
     <string name="login_error_invalid">Credenciales invalidas</string>
     <string name="register_title">Registro</string>
@@ -67,4 +68,34 @@
     <string name="settings_clear_history_confirm">¿Estás seguro de que quieres borrar todos los mensajes? Esta acción no se puede deshacer.</string>
     <string name="settings_app_version">Versión 1.0.4 - Pro</string>
     <string name="settings_logout_btn">Cerrar Sesión</string>
+
+    <!-- Mensajes y Contactos -->
+    <string name="contact_selection_title">¿Con quién hablas?</string>
+    <string name="contact_selection_desc">Escribe el nombre de la persona para organizar tus mensajes.</string>
+    <string name="contact_selection_hint">Nombre (ej. Dr. Pérez, Mamá)</string>
+    <string name="contact_selection_save">Confirmar</string>
+    <string name="contact_selection_clear">Quitar nombre</string>
+    <string name="contact_mode_general">Modo General</string>
+    <string name="contact_mode_speaking_with">Hablando con %1$s</string>
+    <string name="category_hospital">🏥 Hospital</string>
+    <string name="category_transport">🚌 Transporte</string>
+    <string name="category_shopping">🛒 Compras</string>
+    <string name="category_all">🔄 Ver Todo</string>
+    <string name="label_categories">Temas de ayuda</string>
+    <string name="label_recent_people">Personas frecuentes</string>
+    <string name="label_messages_title">Mensajes guardados</string>
+    <string name="empty_messages_category">Aún no hay mensajes aquí.</string>
+    <string name="filter_by_category">Tema: %1$s</string>
+    <string name="filter_by_contact">Con: %1$s</string>
+    <string name="contact_display_name">👤 %1$s</string>
+
+    <!-- Detección de Alarmas -->
+    <string name="emergency_detected_title">🚨 SONIDO IMPORTANTE DETECTADO</string>
+    <string name="emergency_type_siren">🚑 Sirena de emergencia</string>
+    <string name="emergency_type_fire">🔥 Alarma de incendio</string>
+    <string name="emergency_type_horn">📢 Bocina fuerte</string>
+    <string name="emergency_type_smoke">💨 Detector de humo</string>
+    <string name="emergency_type_baby">👶 Bebé llorando</string>
+    <string name="emergency_type_doorbell">🔔 Timbre de puerta</string>
+    <string name="btn_emergency_ok">ENTENDIDO</string>
 </resources>

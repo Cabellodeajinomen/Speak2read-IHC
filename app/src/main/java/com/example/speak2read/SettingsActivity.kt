@@ -50,8 +50,18 @@ class SettingsActivity : AppCompatActivity() {
         val swAlarmDetection = findViewById<SwitchMaterial>(R.id.swAlarmDetection)
         val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
         swAlarmDetection.isChecked = prefs.getBoolean("alarm_detection", true)
+        
         swAlarmDetection.setOnCheckedChangeListener { _, isChecked ->
             prefs.edit().putBoolean("alarm_detection", isChecked).apply()
+            if (isChecked) {
+                if (androidx.core.app.ActivityCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                    startSoundService()
+                } else {
+                    androidx.core.app.ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.RECORD_AUDIO), 100)
+                }
+            } else {
+                stopSoundService()
+            }
         }
 
         // Professional layout buttons
@@ -70,6 +80,16 @@ class SettingsActivity : AppCompatActivity() {
         bottomNav = findViewById(R.id.bottom_navigation)
         bottomNav.selectedItemId = R.id.nav_settings
         setupBottomNavigation()
+    }
+
+    private fun startSoundService() {
+        val intent = Intent(this, com.example.speak2read.service.SoundDetectionService::class.java)
+        startForegroundService(intent)
+    }
+
+    private fun stopSoundService() {
+        val intent = Intent(this, com.example.speak2read.service.SoundDetectionService::class.java)
+        stopService(intent)
     }
 
     private fun updateStatusLabels() {

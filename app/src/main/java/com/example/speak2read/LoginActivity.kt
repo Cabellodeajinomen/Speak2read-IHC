@@ -94,7 +94,14 @@ class LoginActivity : AppCompatActivity() {
             startActivity(Intent(this, HomeActivity::class.java))
             finish()
         } catch (e: ApiException) {
-            Toast.makeText(this, "Error con Google: ${e.statusCode}", Toast.LENGTH_SHORT).show()
+            val errorMessage = when (e.statusCode) {
+                7 -> "Parece que no tienes internet. Por favor, revisa tu conexión."
+                10 -> "Hay un pequeño error técnico (Configuración). Intenta de nuevo más tarde."
+                12500 -> "Hubo un problema interno con Google. Intenta reiniciar la app."
+                12501 -> "Cancelaste el inicio de sesión."
+                else -> "No pudimos conectar con Google en este momento."
+            }
+            Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
         }
     }
 }

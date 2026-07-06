@@ -48,6 +48,16 @@
                     app:rippleColor="#20FF5252" />
 
                 <ImageButton
+                    android:id="@+id/btnSelectContact"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Seleccionar Contacto"
+                    android:padding="12dp"
+                    android:src="@android:drawable/ic_menu_myplaces"
+                    app:tint="@color/s2r_text_secondary" />
+
+                <ImageButton
                     android:id="@+id/btnSettings"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
@@ -78,7 +88,7 @@
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="48dp"
-                    android:text="🏥 Hospital"
+                    android:text="@string/category_hospital"
                     android:textAllCaps="false"
                     android:textColor="@color/s2r_text_primary"
                     app:strokeColor="@color/s2r_surface"
@@ -90,7 +100,7 @@
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="48dp"
-                    android:text="🚌 Transporte"
+                    android:text="@string/category_transport"
                     android:textAllCaps="false"
                     android:textColor="@color/s2r_text_primary"
                     app:strokeColor="@color/s2r_surface"
@@ -102,7 +112,7 @@
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="48dp"
-                    android:text="🛒 Compras"
+                    android:text="@string/category_shopping"
                     android:textAllCaps="false"
                     android:textColor="@color/s2r_text_primary"
                     app:strokeColor="@color/s2r_surface"
@@ -410,6 +420,9 @@
         android:background="#CCFF0000"
         android:gravity="center"
         android:orientation="vertical"
+        android:elevation="100dp"
+        android:clickable="true"
+        android:focusable="true"
         android:visibility="gone">
 
         <ImageView
@@ -421,20 +434,39 @@
             android:tint="@android:color/white" />
 
         <TextView
+            android:id="@+id/tvEmergencyTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="@string/emergency_detected"
+            android:text="@string/emergency_detected_title"
             android:textColor="@android:color/white"
-            android:textSize="24sp"
+            android:textSize="22sp"
+            android:gravity="center"
+            android:paddingHorizontal="20dp"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvEmergencyType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/emergency_type_siren"
+            android:textColor="@android:color/white"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:background="#44000000"
+            android:padding="16dp" />
 
         <Button
             android:id="@+id/btnAcknowledge"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="@string/dialog_accept" />
+            android:layout_height="56dp"
+            android:layout_marginTop="48dp"
+            android:text="@string/btn_emergency_ok"
+            android:paddingHorizontal="32dp"
+            android:textSize="18sp"
+            android:backgroundTint="@android:color/white"
+            android:textColor="@color/s2r_alert" />
     </LinearLayout>
 
 </RelativeLayout>

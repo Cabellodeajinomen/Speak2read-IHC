@@ -11,5 +11,7 @@ data class ChatMessageEntity(
     val text: String,
     val type: String,
     val timestamp: String,
-    val isFavorite: Boolean = false
+    val isFavorite: Boolean = false,
+    val category: String = "General",
+    val contactName: String? = null
 )

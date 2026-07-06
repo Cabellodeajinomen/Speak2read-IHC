@@ -10,5 +10,7 @@ data class ChatMessage(
     val text: String,
     val type: MessageType,
     val timestamp: String,
-    var isFavorite: Boolean = false
+    var isFavorite: Boolean = false,
+    val category: String = "General",
+    val contactName: String? = null
 )

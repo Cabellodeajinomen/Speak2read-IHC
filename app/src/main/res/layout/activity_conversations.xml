@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/s2r_background">
@@ -18,35 +19,123 @@
         android:layout_height="match_parent"
         android:layout_below="@id/toolbar"
         android:layout_above="@id/bottom_navigation"
-        android:gravity="center"
         android:orientation="vertical"
-        android:padding="24dp">
-
-        <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:src="@android:drawable/ic_menu_send"
-            app:tint="@color/s2r_surface"
-            android:alpha="0.3"
-            android:contentDescription="@string/empty_chats_title"/>
+        android:padding="16dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/empty_chats_title"
+            android:text="@string/label_categories"
             android:textColor="@color/s2r_text_primary"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="12dp"
+            android:alpha="0.8"/>
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            android:layout_marginBottom="20dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/filterHospital"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/category_hospital"
+                    android:textAllCaps="false"
+                    android:layout_marginEnd="8dp"
+                    app:cornerRadius="20dp"
+                    app:strokeColor="@color/s2r_accent"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/filterTransporte"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/category_transport"
+                    android:textAllCaps="false"
+                    android:layout_marginEnd="8dp"
+                    app:cornerRadius="20dp"
+                    app:strokeColor="@color/s2r_accent"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/filterCompras"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/category_shopping"
+                    android:textAllCaps="false"
+                    android:layout_marginEnd="8dp"
+                    app:cornerRadius="20dp"
+                    app:strokeColor="@color/s2r_accent"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/filterTodo"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/category_all"
+                    android:textAllCaps="false"
+                    app:cornerRadius="20dp"
+                    app:strokeColor="@color/s2r_accent"/>
+            </LinearLayout>
+        </HorizontalScrollView>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:text="@string/label_recent_people"
+            android:textColor="@color/s2r_text_primary"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="12dp"
+            android:alpha="0.8"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvContactsList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:layout_marginBottom="24dp"
+            tools:listitem="@android:layout/simple_list_item_1"/>
+
+        <TextView
+            android:id="@+id/tvCurrentFilter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_messages_title"
+            android:textColor="@color/s2r_text_primary"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp"
+            android:alpha="0.8"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvContacts"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingBottom="16dp"/>
+
+        <TextView
+            android:id="@+id/tvEmptyState"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/empty_messages_category"
             android:gravity="center"
-            android:text="@string/empty_chats_desc"
+            android:layout_marginTop="40dp"
             android:textColor="@color/s2r_text_secondary"
-            android:textSize="14sp" />
+            android:visibility="gone"/>
+
     </LinearLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView

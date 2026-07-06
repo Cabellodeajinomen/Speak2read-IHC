@@ -16,7 +16,7 @@ android {
     defaultConfig {
         applicationId = "com.example.speak2read"
         minSdk = 33
-        targetSdk = 36
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -54,6 +54,7 @@ dependencies {
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.gridlayout:gridlayout:1.0.0")
     implementation("com.google.android.gms:play-services-auth:21.3.0")
+    implementation("org.tensorflow:tensorflow-lite-task-audio:0.4.4")
 
     // Firebase
     implementation(platform(libs.firebase.bom))
