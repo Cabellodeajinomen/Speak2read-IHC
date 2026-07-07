@@ -9,6 +9,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
+import android.os.Vibrator
+import android.os.VibratorManager
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.speak2read.HomeActivity
@@ -22,6 +24,7 @@ class SoundDetectionService : Service() {
 
     companion object {
         const val ACTION_SOUND_DETECTED = "com.example.speak2read.ACTION_SOUND_DETECTED"
+        const val ACTION_STOP_ALARM = "com.example.speak2read.ACTION_STOP_ALARM"
         const val EXTRA_SOUND_TYPE = "extra_sound_type"
         const val EXTRA_CONFIDENCE = "extra_confidence"
         private const val CHANNEL_ID = "sound_detection_channel"
@@ -29,13 +32,14 @@ class SoundDetectionService : Service() {
         private const val NOTIFICATION_ID = 1001
         private const val EMERGENCY_NOTIFICATION_ID = 911
         private const val MODEL_FILE = "yamnet.tflite"
-        private const val PROBABILITY_THRESHOLD = 0.30f 
+        private const val PROBABILITY_THRESHOLD = 0.35f 
     }
 
     private var audioClassifier: AudioClassifier? = null
     private var audioRecord: android.media.AudioRecord? = null
     private var executor: ScheduledExecutorService? = null
     private var isRunning = false
+    private var isVibrating = false
 
     override fun onCreate() {
         super.onCreate()
@@ -49,6 +53,11 @@ class SoundDetectionService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent?.action == ACTION_STOP_ALARM) {
+            stopEmergency()
+            return START_STICKY
+        }
+
         if (!isRunning) {
             startForeground(NOTIFICATION_ID, createPersistentNotification())
             startDetection()
@@ -74,12 +83,10 @@ class SoundDetectionService : Service() {
     private fun createNotificationChannels() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val manager = getSystemService(NotificationManager::class.java)
-            
             val channel = NotificationChannel(CHANNEL_ID, "Detección de Sonidos", NotificationManager.IMPORTANCE_LOW)
             manager.createNotificationChannel(channel)
             
-            val emergencyChannel = NotificationChannel(EMERGENCY_CHANNEL_ID, "Alertas de Emergencia", NotificationManager.IMPORTANCE_HIGH).apply {
-                description = "Alertas críticas de sirenas y alarmas"
+            val emergencyChannel = NotificationChannel(EMERGENCY_CHANNEL_ID, "Alertas Críticas", NotificationManager.IMPORTANCE_HIGH).apply {
                 enableVibration(true)
                 vibrationPattern = longArrayOf(0, 800, 200, 800)
             }
@@ -94,97 +101,104 @@ class SoundDetectionService : Service() {
         
         executor?.scheduleWithFixedDelay({
             try {
-                // Forma compatible con la versión 0.4.4
-                val tensor = TensorAudio.create(audioClassifier!!.requiredTensorAudioFormat, audioClassifier!!.requiredInputBufferSize.toInt())
-                tensor.load(audioRecord)
-                val results = audioClassifier?.classify(tensor)
+                // Usamos reflexion para asegurar compatibilidad total
+                val createTensorMethod = audioClassifier?.javaClass?.methods?.find { it.name == "createInputAudioTensor" }
+                val audioTensor = createTensorMethod?.invoke(audioClassifier)
                 
-                results?.firstOrNull()?.categories?.forEach { category ->
-                    val label = category.label.lowercase()
-                    val score = category.score
+                if (audioTensor != null) {
+                    val loadMethod = audioTensor.javaClass.methods.find { it.name == "load" && it.parameterTypes.size == 1 }
+                    loadMethod?.invoke(audioTensor, audioRecord)
                     
-                    if (score >= PROBABILITY_THRESHOLD) {
-                        val mappedType = when {
-                            label.contains("siren") || label.contains("ambulance") -> "SIRENA"
-                            label.contains("fire alarm") -> "INCENDIO"
-                            label.contains("smoke detector") -> "HUMO"
-                            label.contains("horn") -> "BOCINA"
-                            else -> null
-                        }
+                    val results = audioClassifier?.classify(audioTensor as TensorAudio) as? List<*>
+                    val classifications = results?.firstOrNull()
+                    
+                    val getCategoriesMethod = classifications?.javaClass?.getMethod("getCategories")
+                    val categories = getCategoriesMethod?.invoke(classifications) as? List<*>
+                    
+                    categories?.forEach { category ->
+                        val getLabel = category?.javaClass?.getMethod("getLabel")
+                        val getScore = category?.javaClass?.getMethod("getScore")
+                        val label = (getLabel?.invoke(category) as? String ?: "").lowercase()
+                        val score = getScore?.invoke(category) as? Float ?: 0f
                         
-                        mappedType?.let {
-                            handleEmergency(it, score)
+                        if (score >= PROBABILITY_THRESHOLD && !isVibrating) {
+                            if (label.contains("siren") || label.contains("alarm") || label.contains("horn")) {
+                                handleEmergency(label.uppercase(), score)
+                            }
                         }
                     }
                 }
             } catch (e: Exception) {
-                Log.e("S2R_Sound", "Ciclo fallido: ${e.message}")
+                Log.e("S2R_Sound", "Ciclo IA fallido: ${e.message}")
             }
         }, 0, 500, TimeUnit.MILLISECONDS)
     }
 
     private fun handleEmergency(soundType: String, confidence: Float) {
-        Log.d("S2R_Sound", "¡ALERTA!: $soundType ($confidence)")
+        isVibrating = true
         
-        // 1. Notificar a la actividad si esta abierta
-        val intent = Intent(ACTION_SOUND_DETECTED).apply {
+        val broadcast = Intent(ACTION_SOUND_DETECTED).apply {
             putExtra(EXTRA_SOUND_TYPE, soundType)
             putExtra(EXTRA_CONFIDENCE, (confidence * 100).toInt())
             setPackage(packageName)
         }
-        sendBroadcast(intent)
+        sendBroadcast(broadcast)
 
-        // 2. Vibrar desde el servicio (Funciona en segundo plano)
         triggerVibration()
-
-        // 3. Mostrar notificacion de impacto
         showEmergencyNotification(soundType)
     }
 
     private fun triggerVibration() {
-        val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val vibratorManager = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as android.os.VibratorManager
-            vibratorManager.defaultVibrator
-        } else {
-            @Suppress("DEPRECATION")
-            getSystemService(Context.VIBRATOR_SERVICE) as android.os.Vibrator
-        }
-        
+        val vibrator = getVibrator()
         val pattern = longArrayOf(0, 1000, 200, 1000, 200, 1000)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            vibrator.vibrate(android.os.VibrationEffect.createWaveform(pattern, -1))
+            vibrator.vibrate(android.os.VibrationEffect.createWaveform(pattern, 0))
         } else {
             @Suppress("DEPRECATION")
-            vibrator.vibrate(pattern, -1)
+            vibrator.vibrate(pattern, 0)
         }
     }
 
     private fun showEmergencyNotification(soundType: String) {
-        val manager = getSystemService(NotificationManager::class.java)
-        val intent = Intent(this, HomeActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-        }
-        val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+        val stopIntent = Intent(this, SoundDetectionService::class.java).apply { action = ACTION_STOP_ALARM }
+        val stopPendingIntent = PendingIntent.getService(this, 1, stopIntent, PendingIntent.FLAG_IMMUTABLE)
+
+        val fullScreenIntent = Intent(this, HomeActivity::class.java)
+        val fullScreenPendingIntent = PendingIntent.getActivity(this, 2, fullScreenIntent, PendingIntent.FLAG_IMMUTABLE)
 
         val notification = NotificationCompat.Builder(this, EMERGENCY_CHANNEL_ID)
             .setContentTitle("🚨 ¡PELIGRO DETECTADO!")
-            .setContentText("Se escucha una $soundType cerca de ti.")
+            .setContentText("Sonido: $soundType")
             .setSmallIcon(android.R.drawable.ic_dialog_alert)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
-            .setAutoCancel(true)
-            .setContentIntent(pendingIntent)
-            .setFullScreenIntent(pendingIntent, true) 
+            .setFullScreenIntent(fullScreenPendingIntent, true)
+            .addAction(android.R.drawable.ic_menu_close_clear_cancel, "DETENER ALERTA", stopPendingIntent)
             .build()
 
-        try {
-            manager.notify(EMERGENCY_NOTIFICATION_ID, notification)
-        } catch (e: Exception) {
-            Log.e("S2R_Sound", "Error al mostrar notificacion: ${e.message}")
+        val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        manager.notify(EMERGENCY_NOTIFICATION_ID, notification)
+    }
+
+    private fun stopEmergency() {
+        isVibrating = false
+        getVibrator().cancel()
+        val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        manager.cancel(EMERGENCY_NOTIFICATION_ID)
+    }
+
+    private fun getVibrator(): Vibrator {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val manager = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+            manager.defaultVibrator
+        } else {
+            @Suppress("DEPRECATION")
+            getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         }
     }
 
     override fun onDestroy() {
+        stopEmergency()
         isRunning = false
         executor?.shutdown()
         audioRecord?.stop()
