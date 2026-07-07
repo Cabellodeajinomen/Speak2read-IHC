@@ -145,6 +145,8 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         if (filterContact != null) {
             currentContact = filterContact
             tvHeaderTitle.text = "Chat: $currentContact"
+            btnExitChat.visibility = View.VISIBLE
+            ivHeaderLogo.visibility = View.GONE
             loadMessages()
         }
 
@@ -233,6 +235,19 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
         if (Speak2ReadPrefs.isAlarmDetectionEnabled(this)) {
             checkAndStartSoundService()
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent) // Actualizar el intent de la actividad
+        val filterContact = intent.getStringExtra("FILTER_CONTACT")
+        if (filterContact != null) {
+            currentContact = filterContact
+            tvHeaderTitle.text = "Chat: $currentContact"
+            btnExitChat.visibility = View.VISIBLE
+            ivHeaderLogo.visibility = View.GONE
+            loadMessages()
         }
     }
 

@@ -27,7 +27,7 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@android:drawable/ic_menu_revert"
+                android:src="@drawable/ic_arrow_back"
                 app:tint="@color/s2r_bubble_usuario"
                 android:visibility="gone"
                 android:contentDescription="Volver al inicio" />
