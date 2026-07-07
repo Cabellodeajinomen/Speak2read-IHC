@@ -95,6 +95,9 @@ class SoundDetectionService : Service() {
                         val label = getLabel?.invoke(category) as? String ?: ""
                         val score = getScore?.invoke(category) as? Float ?: 0f
                         
+                        // LOG PARA PRUEBAS: Veremos esto en el Logcat
+                        Log.d("SoundDetection", "Escuchando: $label ($score)")
+                        
                         val lowerLabel = label.lowercase()
                         (lowerLabel.contains("siren") || 
                          lowerLabel.contains("alarm") || 

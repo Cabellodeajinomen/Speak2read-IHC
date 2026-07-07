@@ -7,11 +7,7 @@ plugins {
 
 android {
     namespace = "com.example.speak2read"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.speak2read"
@@ -38,6 +34,12 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
     }
 }
 

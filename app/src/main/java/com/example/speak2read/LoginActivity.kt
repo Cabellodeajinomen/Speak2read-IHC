@@ -10,10 +10,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var mGoogleSignInClient: GoogleSignInClient
@@ -24,7 +24,7 @@ class LoginActivity : AppCompatActivity() {
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
             handleSignInResult(task)
         } else {
-            Toast.makeText(this, "Google Sign-In cancelado o fallido (${result.resultCode})", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Google Sign-In cancelado", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -35,23 +35,18 @@ class LoginActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
 
-        // Persistencia: Revisar si ya hay sesión activa
         if (auth.currentUser != null) {
-            val user = auth.currentUser
-            Toast.makeText(this, "Sesión activa: ${user?.email}", Toast.LENGTH_SHORT).show()
-            Speak2ReadPrefs.setLoggedUser(this, user?.displayName ?: user?.email?.split("@")?.get(0) ?: "Usuario", "Sordo")
-            startActivity(Intent(this, HomeActivity::class.java))
-            finish()
+            goToHome()
         }
 
-        // Configure Google Sign In
+        val clientId = "598440352422-qbe21f4vo54li0dapjlhjqgoh78nu4q6.apps.googleusercontent.com"
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
-            .requestIdToken(getString(R.string.default_web_client_id)) 
+            .requestIdToken(clientId) 
             .build()
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
 
-        val etEmail = findViewById<EditText>(R.id.etUsername) // Reutilizamos el ID anterior para el correo
+        val etEmail = findViewById<EditText>(R.id.etUsername)
         val etPassword = findViewById<EditText>(R.id.etPassword)
         val btnLogin = findViewById<Button>(R.id.btnLogin)
         val btnRegister = findViewById<Button>(R.id.btnRegister)
@@ -66,37 +61,16 @@ class LoginActivity : AppCompatActivity() {
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             Speak2ReadPrefs.setLoggedUser(this, email.split("@")[0], "Sordo")
-                            startActivity(Intent(this, HomeActivity::class.java))
-                            finish()
+                            goToHome()
                         } else {
                             Toast.makeText(this, "Error: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                         }
                     }
-            } else {
-                Toast.makeText(this, "Completa todos los campos", Toast.LENGTH_SHORT).show()
             }
         }
 
         btnGoogle.setOnClickListener {
-            val googleApiAvailability = com.google.android.gms.common.GoogleApiAvailability.getInstance()
-            val resultCode = googleApiAvailability.isGooglePlayServicesAvailable(this)
-            if (resultCode != com.google.android.gms.common.ConnectionResult.SUCCESS) {
-                googleApiAvailability.getErrorDialog(this, resultCode, 2404)?.show()
-                return@setOnClickListener
-            }
-
-            try {
-                if (!::mGoogleSignInClient.isInitialized) {
-                    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestEmail()
-                        .requestIdToken(getString(R.string.default_web_client_id)) 
-                        .build()
-                    mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
-                }
-                googleSignInLauncher.launch(mGoogleSignInClient.signInIntent)
-            } catch (e: Exception) {
-                Toast.makeText(this, "Error al iniciar Google: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
+            googleSignInLauncher.launch(mGoogleSignInClient.signInIntent)
         }
 
         btnRegister.setOnClickListener {
@@ -106,20 +80,29 @@ class LoginActivity : AppCompatActivity() {
 
     private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) {
         try {
-            val account = completedTask.getResult(ApiException::class.java)
-            val name = account?.displayName ?: "Usuario Google"
-            Speak2ReadPrefs.setLoggedUser(this, name, "Sordo")
-            startActivity(Intent(this, HomeActivity::class.java))
-            finish()
+            val account = completedTask.getResult(ApiException::class.java)!!
+            firebaseAuthWithGoogle(account.idToken!!)
         } catch (e: ApiException) {
-            val errorMessage = when (e.statusCode) {
-                7 -> "Parece que no tienes internet. Por favor, revisa tu conexión."
-                10 -> "Hay un pequeño error técnico (Configuración). Intenta de nuevo más tarde."
-                12500 -> "Hubo un problema interno con Google. Intenta reiniciar la app."
-                12501 -> "Cancelaste el inicio de sesión."
-                else -> "No pudimos conectar con Google en este momento."
-            }
-            Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Error Google: ${e.statusCode}", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun firebaseAuthWithGoogle(idToken: String) {
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+        auth.signInWithCredential(credential)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    val user = auth.currentUser
+                    Speak2ReadPrefs.setLoggedUser(this, user?.displayName ?: "Usuario Google", "Sordo")
+                    goToHome()
+                } else {
+                    Toast.makeText(this, "Error Firebase: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+
+    private fun goToHome() {
+        startActivity(Intent(this, HomeActivity::class.java))
+        finish()
     }
 }
