@@ -16,9 +16,17 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 
 class LoginActivity : AppCompatActivity() {
-    private val RC_SIGN_IN = 9001
     private lateinit var mGoogleSignInClient: GoogleSignInClient
     private lateinit var auth: FirebaseAuth
+
+    private val googleSignInLauncher = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == android.app.Activity.RESULT_OK) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            handleSignInResult(task)
+        } else {
+            Toast.makeText(this, "Google Sign-In cancelado o fallido (${result.resultCode})", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Speak2ReadPrefs.applySettings(this)
@@ -47,7 +55,7 @@ class LoginActivity : AppCompatActivity() {
         val etPassword = findViewById<EditText>(R.id.etPassword)
         val btnLogin = findViewById<Button>(R.id.btnLogin)
         val btnRegister = findViewById<Button>(R.id.btnRegister)
-        val btnGoogle = findViewById<SignInButton>(R.id.btnGoogleLogin)
+        val btnGoogle = findViewById<Button>(R.id.btnGoogleLogin)
 
         btnLogin.setOnClickListener {
             val email = etEmail.text.toString().trim()
@@ -70,20 +78,29 @@ class LoginActivity : AppCompatActivity() {
         }
 
         btnGoogle.setOnClickListener {
-            val signInIntent = mGoogleSignInClient.signInIntent
-            startActivityForResult(signInIntent, RC_SIGN_IN)
+            val googleApiAvailability = com.google.android.gms.common.GoogleApiAvailability.getInstance()
+            val resultCode = googleApiAvailability.isGooglePlayServicesAvailable(this)
+            if (resultCode != com.google.android.gms.common.ConnectionResult.SUCCESS) {
+                googleApiAvailability.getErrorDialog(this, resultCode, 2404)?.show()
+                return@setOnClickListener
+            }
+
+            try {
+                if (!::mGoogleSignInClient.isInitialized) {
+                    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestEmail()
+                        .requestIdToken(getString(R.string.default_web_client_id)) 
+                        .build()
+                    mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
+                }
+                googleSignInLauncher.launch(mGoogleSignInClient.signInIntent)
+            } catch (e: Exception) {
+                Toast.makeText(this, "Error al iniciar Google: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
         }
 
         btnRegister.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == RC_SIGN_IN) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-            handleSignInResult(task)
         }
     }
 
