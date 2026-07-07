@@ -72,9 +72,9 @@ class SoundDetectionService : Service() {
         
         executor?.scheduleWithFixedDelay({
             try {
-                // Obtenemos el tensor de entrada directamente del clasificador
-                val tensor = audioClassifier?.createInputAudioTensor()
-                tensor?.load(audioRecord)
+                // Forma compatible con la version 0.4.4
+                val tensor = TensorAudio.create(audioClassifier!!.requiredTensorAudioFormat, audioClassifier!!.requiredInputBufferSize.toInt())
+                tensor.load(audioRecord)
                 
                 val results = audioClassifier?.classify(tensor)
                 
