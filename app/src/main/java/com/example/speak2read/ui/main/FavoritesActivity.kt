@@ -1,6 +1,5 @@
-package com.example.speak2read
+package com.example.speak2read.ui.main
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
@@ -10,10 +9,13 @@ import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
-import com.example.speak2read.adapter.ChatAdapter
-import com.example.speak2read.database.Speak2ReadDatabase
-import com.example.speak2read.model.ChatMessage
-import com.example.speak2read.model.MessageType
+import com.example.speak2read.R
+import com.example.speak2read.ui.adapter.ChatAdapter
+import com.example.speak2read.data.local.Speak2ReadPrefs
+import com.example.speak2read.ui.settings.SettingsActivity
+import com.example.speak2read.data.local.Speak2ReadDatabase
+import com.example.speak2read.data.model.ChatMessage
+import com.example.speak2read.data.model.MessageType
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import java.util.Locale
@@ -64,7 +66,7 @@ class FavoritesActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                 R.id.nav_home -> { startActivity(Intent(this, HomeActivity::class.java)); finish(); true }
                 R.id.nav_conversations -> { startActivity(Intent(this, ConversationsActivity::class.java)); finish(); true }
                 R.id.nav_favorites -> true
-                R.id.nav_settings -> { startActivity(Intent(this, SettingsActivity::class.java)); false }
+                R.id.nav_settings -> { startActivity(Intent(this, SettingsActivity::class.java)); finish(); true }
                 else -> false
             }
         }

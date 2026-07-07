@@ -1,4 +1,4 @@
-package com.example.speak2read.adapter
+package com.example.speak2read.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -7,9 +7,9 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.speak2read.R
-import com.example.speak2read.Speak2ReadPrefs
-import com.example.speak2read.model.ChatMessage
-import com.example.speak2read.model.MessageType
+import com.example.speak2read.data.local.Speak2ReadPrefs
+import com.example.speak2read.data.model.ChatMessage
+import com.example.speak2read.data.model.MessageType
 
 class ChatAdapter(
     private val messages: MutableList<ChatMessage> = mutableListOf(),

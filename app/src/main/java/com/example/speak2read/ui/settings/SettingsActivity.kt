@@ -1,4 +1,4 @@
-package com.example.speak2read
+package com.example.speak2read.ui.settings
 
 import android.app.AlertDialog
 import android.content.Intent
@@ -9,7 +9,13 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.room.Room
-import com.example.speak2read.database.Speak2ReadDatabase
+import com.example.speak2read.R
+import com.example.speak2read.data.local.Speak2ReadPrefs
+import com.example.speak2read.ui.auth.LoginActivity
+import com.example.speak2read.ui.main.HomeActivity
+import com.example.speak2read.ui.main.ConversationsActivity
+import com.example.speak2read.ui.main.FavoritesActivity
+import com.example.speak2read.data.local.Speak2ReadDatabase
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.firebase.auth.FirebaseAuth

@@ -13,7 +13,7 @@ import android.os.Vibrator
 import android.os.VibratorManager
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.example.speak2read.HomeActivity
+import com.example.speak2read.ui.main.HomeActivity
 import org.tensorflow.lite.task.audio.classifier.AudioClassifier
 import org.tensorflow.lite.support.audio.TensorAudio
 import java.util.concurrent.Executors

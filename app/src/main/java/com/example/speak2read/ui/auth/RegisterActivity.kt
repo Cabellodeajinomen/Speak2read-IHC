@@ -1,4 +1,4 @@
-package com.example.speak2read
+package com.example.speak2read.ui.auth
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,6 +6,9 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.speak2read.R
+import com.example.speak2read.data.local.Speak2ReadPrefs
+import com.example.speak2read.ui.main.HomeActivity
 import com.google.firebase.auth.FirebaseAuth
 
 class RegisterActivity : AppCompatActivity() {

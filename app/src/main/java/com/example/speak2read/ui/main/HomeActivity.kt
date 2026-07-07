@@ -1,4 +1,4 @@
-package com.example.speak2read
+package com.example.speak2read.ui.main
 
 import android.animation.ObjectAnimator
 import android.app.Activity
@@ -22,9 +22,13 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.core.content.ContextCompat
-import com.example.speak2read.adapter.ChatAdapter
-import com.example.speak2read.model.ChatMessage
-import com.example.speak2read.model.MessageType
+import com.example.speak2read.R
+import com.example.speak2read.ui.adapter.ChatAdapter
+import com.example.speak2read.data.local.Speak2ReadPrefs
+import com.example.speak2read.ui.auth.LoginActivity
+import com.example.speak2read.ui.settings.SettingsActivity
+import com.example.speak2read.data.model.ChatMessage
+import com.example.speak2read.data.model.MessageType
 import java.util.Locale
 import android.Manifest
 import android.content.pm.PackageManager
@@ -33,8 +37,8 @@ import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import androidx.core.app.ActivityCompat
 import androidx.room.Room
-import com.example.speak2read.database.ChatMessageEntity
-import com.example.speak2read.database.Speak2ReadDatabase
+import com.example.speak2read.data.local.ChatMessageEntity
+import com.example.speak2read.data.local.Speak2ReadDatabase
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
@@ -186,7 +190,7 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             
             // IHC: Pausar servicio de alarma para que no robe el microfono
             stopSoundService()
-
+            
             startMicPulse()
             val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
                 putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
@@ -237,7 +241,7 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         applyFontScale()
 
         if (Speak2ReadPrefs.isAlarmDetectionEnabled(this)) {
-            checkAndStartSoundService()
+            startSoundService()
         }
     }
 
@@ -254,13 +258,14 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         }
     }
 
-    private fun checkAndStartSoundService() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-            val intent = Intent(this, com.example.speak2read.service.SoundDetectionService::class.java)
-            startForegroundService(intent)
-        } else {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), REQUEST_RECORD_AUDIO)
-        }
+    private fun startSoundService() {
+        val intent = Intent(this, com.example.speak2read.service.SoundDetectionService::class.java)
+        startForegroundService(intent)
+    }
+
+    private fun stopSoundService() {
+        val intent = Intent(this, com.example.speak2read.service.SoundDetectionService::class.java)
+        stopService(intent)
     }
 
     private fun applyFontScale() {
@@ -293,16 +298,6 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                 else -> false
             }
         }
-    }
-
-    private fun startSoundService() {
-        val intent = Intent(this, com.example.speak2read.service.SoundDetectionService::class.java)
-        startForegroundService(intent)
-    }
-
-    private fun stopSoundService() {
-        val intent = Intent(this, com.example.speak2read.service.SoundDetectionService::class.java)
-        stopService(intent)
     }
 
     private fun setAppContext(ctx: String) {
@@ -374,7 +369,7 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_RECORD_AUDIO && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             if (Speak2ReadPrefs.isAlarmDetectionEnabled(this)) {
-                checkAndStartSoundService()
+                startSoundService()
             }
             if (listening) {
                 btnMicTranscription.performClick()
@@ -511,6 +506,7 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         
         tvEmergencyType.text = "$displayType\n($confidence%)"
         emergencyOverlay.visibility = View.VISIBLE
+
         android.util.Log.d("S2R_Home", "¡EMERGENCIA DETECTADA! Mostrando overlay y activando vibracion...")
         
         // VIBRACIÓN MEJORADA (Compatible con Android 12+)

@@ -1,4 +1,4 @@
-package com.example.speak2read.model
+package com.example.speak2read.data.model
 
 enum class ContextType {
     GENERAL,

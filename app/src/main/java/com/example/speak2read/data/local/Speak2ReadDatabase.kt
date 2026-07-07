@@ -1,4 +1,4 @@
-package com.example.speak2read.database
+package com.example.speak2read.data.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase

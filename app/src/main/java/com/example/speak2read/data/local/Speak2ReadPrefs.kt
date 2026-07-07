@@ -1,4 +1,4 @@
-package com.example.speak2read
+package com.example.speak2read.data.local
 
 import android.content.Context
 

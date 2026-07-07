@@ -1,4 +1,4 @@
-package com.example.speak2read
+package com.example.speak2read.ui.main
 
 import android.content.Intent
 import android.os.Bundle
@@ -10,9 +10,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
-import com.example.speak2read.adapter.ChatItem
-import com.example.speak2read.adapter.ContactAdapter
-import com.example.speak2read.database.Speak2ReadDatabase
+import com.example.speak2read.R
+import com.example.speak2read.ui.adapter.ChatItem
+import com.example.speak2read.ui.adapter.ContactAdapter
+import com.example.speak2read.data.local.Speak2ReadPrefs
+import com.example.speak2read.ui.settings.SettingsActivity
+import com.example.speak2read.data.local.Speak2ReadDatabase
 import com.google.firebase.auth.FirebaseAuth
 
 class ConversationsActivity : AppCompatActivity() {
