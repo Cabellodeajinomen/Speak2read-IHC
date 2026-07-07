@@ -230,8 +230,7 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         btnAcknowledge.setOnClickListener {
             emergencyOverlay.visibility = View.GONE
             stopWarningBlink()
-            val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as android.os.Vibrator
-            vibrator.cancel()
+            stopEmergencyVibration()
         }
 
         setupBottomNavigation()
@@ -512,17 +511,54 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         
         tvEmergencyType.text = "$displayType\n($confidence%)"
         emergencyOverlay.visibility = View.VISIBLE
+        android.util.Log.d("S2R_Home", "¡EMERGENCIA DETECTADA! Mostrando overlay y activando vibracion...")
         
-        // VIBRACIÓN AGRESIVA EN BUCLE (500ms vibrar, 100ms pausa, 500ms vibrar...)
-        val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as android.os.Vibrator
-        val pattern = longArrayOf(0, 600, 150, 600, 150, 600)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            vibrator.vibrate(android.os.VibrationEffect.createWaveform(pattern, 0)) // El 0 significa repetir bucle
-        } else {
-            vibrator.vibrate(pattern, 0)
+        // VIBRACIÓN MEJORADA (Compatible con Android 12+)
+        try {
+            val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                val vibratorManager = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as android.os.VibratorManager
+                vibratorManager.defaultVibrator
+            } else {
+                @Suppress("DEPRECATION")
+                getSystemService(Context.VIBRATOR_SERVICE) as android.os.Vibrator
+            }
+
+            if (vibrator.hasVibrator()) {
+                val pattern = longArrayOf(0, 600, 150, 600, 150, 600)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    val audioAttributes = android.media.AudioAttributes.Builder()
+                        .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                        .setUsage(android.media.AudioAttributes.USAGE_ALARM)
+                        .build()
+                    vibrator.vibrate(android.os.VibrationEffect.createWaveform(pattern, 0), audioAttributes)
+                } else {
+                    @Suppress("DEPRECATION")
+                    vibrator.vibrate(pattern, 0)
+                }
+                android.util.Log.d("S2R_Home", "Vibracion enviada al hardware")
+            } else {
+                android.util.Log.w("S2R_Home", "El dispositivo no tiene hardware de vibracion")
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("S2R_Home", "Error al vibrar: ${e.message}")
         }
         
         startWarningBlink()
+    }
+
+    private fun stopEmergencyVibration() {
+        try {
+            val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                val vibratorManager = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as android.os.VibratorManager
+                vibratorManager.defaultVibrator
+            } else {
+                @Suppress("DEPRECATION")
+                getSystemService(Context.VIBRATOR_SERVICE) as android.os.Vibrator
+            }
+            vibrator.cancel()
+        } catch (e: Exception) {
+            android.util.Log.e("S2R_Home", "Error al detener vibracion: ${e.message}")
+        }
     }
 
     private fun registerEmergencyReceiverIfNeeded() {
@@ -586,6 +622,13 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     }
 
     private fun sendQuickReply(text: String) {
+        // Pequeña vibracion tactil (Haptic feedback)
+        val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as android.os.Vibrator
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibrator.vibrate(android.os.VibrationEffect.createOneShot(50, android.os.VibrationEffect.DEFAULT_AMPLITUDE))
+        } else {
+            vibrator.vibrate(50)
+        }
         addMessage(text, MessageType.SEND)
         speakText(text)
     }
