@@ -73,7 +73,7 @@ class SettingsActivity : AppCompatActivity() {
             showClearHistoryDialog()
         }
 
-        findViewById<LinearLayout>(R.id.btnLogoutLayout).setOnClickListener {
+        findViewById<com.google.android.material.button.MaterialButton>(R.id.btnLogoutLayout).setOnClickListener {
             showLogoutConfirmDialog()
         }
 
