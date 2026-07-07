@@ -2,9 +2,6 @@
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
     <background android:drawable="@drawable/ic_launcher_background" />
     <foreground>
-        <inset android:drawable="@drawable/logo_new_v4" android:inset="12%" />
+        <inset android:drawable="@drawable/logo_final_v5" android:inset="14%" />
     </foreground>
-    <monochrome>
-        <inset android:drawable="@drawable/logo_new_v4" android:inset="12%" />
-    </monochrome>
 </adaptive-icon>

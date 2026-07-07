@@ -23,7 +23,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="fitCenter"
-            android:src="@drawable/logo_new_v4"
+            android:src="@drawable/logo_final_v5"
             android:contentDescription="@string/login_logo_desc"
             android:padding="8dp" />
     </com.google.android.material.card.MaterialCardView>
