@@ -90,6 +90,11 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         setContentView(R.layout.activity_home)
 
         auth = FirebaseAuth.getInstance()
+        if (auth.currentUser == null) {
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+            return
+        }
         currentUserId = auth.currentUser?.uid ?: "guest"
 
         tts = TextToSpeech(this, this)
@@ -138,7 +143,10 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         btnSosHeader.setOnClickListener { showSosConfirmation() }
         updateQuickReplies(Speak2ReadPrefs.getCurrentContext(this))
 
-        findViewById<ImageButton>(R.id.btnSettings).setOnClickListener { startActivity(Intent(this, SettingsActivity::class.java)) }
+        findViewById<ImageButton>(R.id.btnSettings).setOnClickListener { 
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+        }
         btnSelectContact.setOnClickListener { showContactDialog() }
 
         // Context Buttons
@@ -214,7 +222,6 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             val intent = Intent(this, com.example.speak2read.service.SoundDetectionService::class.java)
             startForegroundService(intent)
         } else {
-            // Si no hay permiso, lo pedimos. El servicio se iniciará tras aceptar.
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), REQUEST_RECORD_AUDIO)
         }
     }
@@ -230,12 +237,22 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     }
 
     private fun setupBottomNavigation() {
+        bottomNav.selectedItemId = R.id.nav_home
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_home -> true
-                R.id.nav_conversations -> { startActivity(Intent(this, ConversationsActivity::class.java)); finish(); true }
-                R.id.nav_favorites -> { startActivity(Intent(this, FavoritesActivity::class.java)); finish(); true }
-                R.id.nav_settings -> { startActivity(Intent(this, SettingsActivity::class.java)); false }
+                R.id.nav_conversations -> { 
+                    startActivity(Intent(this, ConversationsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT))
+                    true 
+                }
+                R.id.nav_favorites -> { 
+                    startActivity(Intent(this, FavoritesActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT))
+                    true 
+                }
+                R.id.nav_settings -> { 
+                    startActivity(Intent(this, SettingsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT))
+                    false 
+                }
                 else -> false
             }
         }
@@ -298,11 +315,9 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_RECORD_AUDIO && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            // Re-intentar iniciar servicio si el permiso fue concedido
             if (Speak2ReadPrefs.isAlarmDetectionEnabled(this)) {
                 checkAndStartSoundService()
             }
-            // También para el botón del micrófono si estaba esperando
             if (listening) {
                 btnMicTranscription.performClick()
             }
@@ -312,6 +327,8 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     override fun onStart() {
         super.onStart()
         registerEmergencyReceiverIfNeeded()
+        // Asegurar que el tab correcto esté seleccionado al volver
+        bottomNav.selectedItemId = R.id.nav_home
     }
 
     override fun onStop() {
@@ -331,7 +348,6 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             .setView(dialogView)
             .create()
             
-        // Ajustar fondo transparente para que se vea el corner radius si el layout lo tiene
         alertDialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
         btnSave.setOnClickListener {
@@ -414,15 +430,13 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             "INCENDIO" -> getString(R.string.emergency_type_fire)
             "BOCINA" -> getString(R.string.emergency_type_horn)
             "HUMO" -> getString(R.string.emergency_type_smoke)
-            "LLANTO" -> getString(R.string.emergency_type_baby)
-            "TIMBRE" -> getString(R.string.emergency_type_doorbell)
+            "AMBULANCIA" -> "Ambulancia"
             else -> soundType
         }
         
         tvEmergencyType.text = "$displayType\n($confidence%)"
         emergencyOverlay.visibility = View.VISIBLE
         
-        // Vibración para alertar al usuario
         val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as android.os.Vibrator
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             vibrator.vibrate(android.os.VibrationEffect.createWaveform(longArrayOf(0, 500, 200, 500), 0))

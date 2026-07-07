@@ -10,7 +10,6 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import org.tensorflow.lite.task.audio.classifier.AudioClassifier
-import org.tensorflow.lite.support.audio.TensorAudio
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
@@ -24,7 +23,7 @@ class SoundDetectionService : Service() {
         private const val CHANNEL_ID = "sound_detection_channel"
         private const val NOTIFICATION_ID = 1001
         private const val MODEL_FILE = "yamnet.tflite"
-        private const val PROBABILITY_THRESHOLD = 0.6f
+        private const val PROBABILITY_THRESHOLD = 0.45f
     }
 
     private var audioClassifier: AudioClassifier? = null
@@ -76,7 +75,7 @@ class SoundDetectionService : Service() {
         
         executor?.scheduleWithFixedDelay({
             try {
-                // Usamos reflexión para obtener el tensor y evitar errores de compilación por versiones
+                // Usamos reflexión para máxima compatibilidad entre versiones de la librería Audio Task
                 val createTensorMethod = audioClassifier?.javaClass?.methods?.find { it.name == "createInputAudioTensor" }
                 val audioTensor = createTensorMethod?.invoke(audioClassifier)
                 
@@ -84,10 +83,9 @@ class SoundDetectionService : Service() {
                     val loadMethod = audioTensor.javaClass.methods.find { it.name == "load" && it.parameterTypes.size == 1 }
                     loadMethod?.invoke(audioTensor, audioRecord)
                     
-                    val results = audioClassifier?.classify(audioTensor as TensorAudio) as? List<*>
+                    val results = audioClassifier?.classify(audioTensor as org.tensorflow.lite.support.audio.TensorAudio) as? List<*>
                     val classifications = results?.firstOrNull()
                     
-                    // Acceder a las categorías por reflexión para ser 100% seguros
                     val getCategoriesMethod = classifications?.javaClass?.getMethod("getCategories")
                     val categories = getCategoriesMethod?.invoke(classifications) as? List<*>
                     
@@ -101,7 +99,9 @@ class SoundDetectionService : Service() {
                         (lowerLabel.contains("siren") || 
                          lowerLabel.contains("alarm") || 
                          lowerLabel.contains("horn") || 
-                         lowerLabel.contains("smoke detector")) && score >= PROBABILITY_THRESHOLD
+                         lowerLabel.contains("smoke detector") ||
+                         lowerLabel.contains("emergency") ||
+                         lowerLabel.contains("ambulance")) && score >= PROBABILITY_THRESHOLD
                     }
 
                     topCategory?.let { category ->
@@ -111,10 +111,11 @@ class SoundDetectionService : Service() {
                         val score = getScore.invoke(category) as Float
                         
                         val mappedType = when {
-                            label.lowercase().contains("fire alarm") -> "INCENDIO"
-                            label.lowercase().contains("smoke detector") -> "HUMO"
+                            label.lowercase().contains("fire") -> "INCENDIO"
+                            label.lowercase().contains("smoke") -> "HUMO"
                             label.lowercase().contains("siren") -> "SIRENA"
                             label.lowercase().contains("horn") -> "BOCINA"
+                            label.lowercase().contains("ambulance") -> "AMBULANCIA"
                             else -> label.uppercase()
                         }
                         sendDetectionBroadcast(mappedType, score)

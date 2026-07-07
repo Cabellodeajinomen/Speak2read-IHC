@@ -30,6 +30,7 @@ class LoginActivity : AppCompatActivity() {
         // Persistencia: Revisar si ya hay sesión activa
         if (auth.currentUser != null) {
             val user = auth.currentUser
+            Toast.makeText(this, "Sesión activa: ${user?.email}", Toast.LENGTH_SHORT).show()
             Speak2ReadPrefs.setLoggedUser(this, user?.displayName ?: user?.email?.split("@")?.get(0) ?: "Usuario", "Sordo")
             startActivity(Intent(this, HomeActivity::class.java))
             finish()
