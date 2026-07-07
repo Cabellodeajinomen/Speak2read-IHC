@@ -133,6 +133,14 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         rvChat.adapter = adapter
 
         loadMessages()
+        
+        // Manejar apertura de un chat especifico
+        val filterContact = intent.getStringExtra("FILTER_CONTACT")
+        if (filterContact != null) {
+            currentContact = filterContact
+            Toast.makeText(this, "Chat con: $currentContact", Toast.LENGTH_SHORT).show()
+            loadMessages() // Recargar con el filtro
+        }
 
         // Quick replies clicks
         findViewById<View>(R.id.qr_si).setOnClickListener { sendQuickReply(findViewById<TextView>(R.id.tvQr1).text.toString()) }

@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/s2r_background">
 
+    <!-- HEADER IGUAL AL HOME -->
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/toolbar"
+        android:id="@+id/sosHeader"
         android:layout_width="match_parent"
         android:layout_height="64dp"
         app:cardElevation="4dp"
         app:cardCornerRadius="0dp"
+        app:layout_constraintTop_toTopOf="parent"
         app:cardBackgroundColor="@color/s2r_surface">
 
         <LinearLayout
@@ -31,145 +33,41 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:text="@string/title_conversations"
+                android:text="Mis Chats"
                 android:textStyle="bold"
                 android:textSize="18sp"
                 android:textColor="@color/s2r_text_primary" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <LinearLayout
+    <!-- LISTA DE CONVERSACIONES -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvContactsList"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/toolbar"
-        android:layout_above="@id/bottom_navigation"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_height="0dp"
+        android:paddingTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/sosHeader"
+        app:layout_bottom_toTopOf="@id/bottom_navigation"
+        tools:listitem="@android:layout/simple_list_item_2" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/label_categories"
-            android:textColor="@color/s2r_text_primary"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:layout_marginBottom="12dp"
-            android:alpha="0.8"/>
-
-        <HorizontalScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scrollbars="none"
-            android:layout_marginBottom="20dp">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/filterHospital"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/category_hospital"
-                    android:textAllCaps="false"
-                    android:layout_marginEnd="8dp"
-                    app:cornerRadius="20dp"
-                    app:strokeColor="@color/s2r_accent"/>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/filterTransporte"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/category_transport"
-                    android:textAllCaps="false"
-                    android:layout_marginEnd="8dp"
-                    app:cornerRadius="20dp"
-                    app:strokeColor="@color/s2r_accent"/>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/filterCompras"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/category_shopping"
-                    android:textAllCaps="false"
-                    android:layout_marginEnd="8dp"
-                    app:cornerRadius="20dp"
-                    app:strokeColor="@color/s2r_accent"/>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/filterTodo"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/category_all"
-                    android:textAllCaps="false"
-                    app:cornerRadius="20dp"
-                    app:strokeColor="@color/s2r_accent"/>
-            </LinearLayout>
-        </HorizontalScrollView>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/label_recent_people"
-            android:textColor="@color/s2r_text_primary"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:layout_marginBottom="12dp"
-            android:alpha="0.8"/>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvContactsList"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            android:layout_marginBottom="24dp"
-            tools:listitem="@android:layout/simple_list_item_1"/>
-
-        <TextView
-            android:id="@+id/tvCurrentFilter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/label_messages_title"
-            android:textColor="@color/s2r_text_primary"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:layout_marginBottom="8dp"
-            android:alpha="0.8"/>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvContacts"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:clipToPadding="false"
-            android:paddingBottom="16dp"/>
-
-        <TextView
-            android:id="@+id/tvEmptyState"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/empty_messages_category"
-            android:gravity="center"
-            android:layout_marginTop="40dp"
-            android:textColor="@color/s2r_text_secondary"
-            android:visibility="gone"/>
-
-    </LinearLayout>
+    <TextView
+        android:id="@+id/tvEmptyState"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Aún no tienes chats guardados"
+        android:textColor="@color/s2r_text_secondary"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_bottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_endOf_toEndOf="parent" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="@color/s2r_surface"
-        app:itemIconTint="@color/s2r_text_secondary"
-        app:itemTextColor="@color/s2r_text_secondary"
-        app:menu="@menu/bottom_nav_menu" />
+        app:layout_bottom_toBottomOf="parent"
+        app:menu="@menu/bottom_nav_menu"
+        android:background="@color/s2r_surface" />
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

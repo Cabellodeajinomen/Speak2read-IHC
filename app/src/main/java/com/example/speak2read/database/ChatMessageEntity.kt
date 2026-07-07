@@ -7,11 +7,12 @@ import androidx.room.PrimaryKey
 data class ChatMessageEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val userId: String, // ID único del usuario de Firebase
+    val userId: String,
     val text: String,
     val type: String,
     val timestamp: String,
     val isFavorite: Boolean = false,
-    val category: String = "General",
-    val contactName: String? = null
+    val category: String = "GENERAL",
+    val contactName: String? = null,
+    val isPinned: Boolean = false // Nueva columna para fijar chats
 )

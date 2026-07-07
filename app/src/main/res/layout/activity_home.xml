@@ -164,11 +164,69 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:paddingVertical="4dp">
-            <Button android:id="@+id/btnHospital" style="@style/Widget.MaterialComponents.Button.TextButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Hospital" android:textSize="12sp" />
-            <Button android:id="@+id/btnTransporte" style="@style/Widget.MaterialComponents.Button.TextButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Bus" android:textSize="12sp" />
-            <Button android:id="@+id/btnCompras" style="@style/Widget.MaterialComponents.Button.TextButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Compras" android:textSize="12sp" />
-            <Button android:id="@+id/btnEmergencia" style="@style/Widget.MaterialComponents.Button.TextButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="SOS" android:textSize="12sp" />
-            <Button android:id="@+id/btnPersonalizado" style="@style/Widget.MaterialComponents.Button.TextButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Mío" android:textSize="12sp" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnHospital"
+                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="🏥 Hospital"
+                android:textAllCaps="false"
+                app:cornerRadius="12dp"
+                android:backgroundTint="@color/s2r_bubble_interlocutor"
+                android:textColor="@color/s2r_text_primary"
+                android:textSize="12sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnTransporte"
+                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="🚌 Bus"
+                android:textAllCaps="false"
+                app:cornerRadius="12dp"
+                android:backgroundTint="@color/s2r_bubble_interlocutor"
+                android:textColor="@color/s2r_text_primary"
+                android:textSize="12sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCompras"
+                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="🛍️ Compras"
+                android:textAllCaps="false"
+                app:cornerRadius="12dp"
+                android:backgroundTint="@color/s2r_bubble_interlocutor"
+                android:textColor="@color/s2r_text_primary"
+                android:textSize="12sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEmergencia"
+                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="🚨 SOS"
+                android:textAllCaps="false"
+                app:cornerRadius="12dp"
+                android:backgroundTint="@color/s2r_bubble_interlocutor"
+                android:textColor="@color/s2r_text_primary"
+                android:textSize="12sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPersonalizado"
+                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="👤 Mío"
+                android:textAllCaps="false"
+                app:cornerRadius="12dp"
+                android:backgroundTint="@color/s2r_bubble_interlocutor"
+                android:textColor="@color/s2r_text_primary"
+                android:textSize="12sp" />
         </LinearLayout>
     </HorizontalScrollView>
 
