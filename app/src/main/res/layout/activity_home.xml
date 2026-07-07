@@ -392,52 +392,66 @@
         app:menu="@menu/bottom_nav_menu"
         android:background="@color/s2r_surface" />
 
-    <!-- OVERLAY EMERGENCIA -->
+    <!-- OVERLAY EMERGENCIA (PANTALLA COMPLETA TOTAL) -->
     <FrameLayout
         android:id="@+id/emergencyOverlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:background="#E6D32F2F"
         android:visibility="gone"
+        android:elevation="100dp"
         android:clickable="true"
-        android:focusable="true">
+        android:focusable="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="24dp">
+
             <ImageView
                 android:id="@+id/imgWarning"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="140dp"
+                android:layout_height="140dp"
                 android:src="@android:drawable/ic_dialog_alert"
                 app:tint="@color/white"
                 android:contentDescription="Alerta" />
+
             <TextView
                 android:id="@+id/tvEmergencyTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="¡ALERTA!"
+                android:text="¡PELIGRO!"
                 android:textColor="@color/white"
-                android:textSize="40sp"
-                android:textStyle="bold" />
+                android:textSize="48sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
             <TextView
                 android:id="@+id/tvEmergencyType"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sonido de Peligro"
+                android:text="ALGO ESTÁ SONANDO"
                 android:textColor="@color/white"
-                android:textSize="24sp"
+                android:textSize="28sp"
                 android:gravity="center"
-                android:layout_marginTop="8dp" />
-            <Button
+                android:layout_marginTop="16dp" />
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAcknowledge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="40dp"
-                android:paddingHorizontal="32dp"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:layout_marginTop="60dp"
+                app:cornerRadius="36dp"
                 android:backgroundTint="@color/white"
                 android:text="ENTENDIDO"
+                android:textSize="20sp"
+                android:textStyle="bold"
                 android:textColor="@color/s2r_alert" />
         </LinearLayout>
     </FrameLayout>

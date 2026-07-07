@@ -502,22 +502,24 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
     private fun showEmergencyOverlay(soundType: String, confidence: Int) {
         val displayType = when(soundType) {
-            "SIRENA" -> getString(R.string.emergency_type_siren)
-            "INCENDIO" -> getString(R.string.emergency_type_fire)
-            "BOCINA" -> getString(R.string.emergency_type_horn)
-            "HUMO" -> getString(R.string.emergency_type_smoke)
-            "AMBULANCIA" -> "Ambulancia"
-            else -> soundType
+            "SIRENA" -> "🚨 SIRENA DETECTADA"
+            "INCENDIO" -> "🔥 ¡FUEGO / ALARMA!"
+            "BOCINA" -> "📢 BOCINA CERCA"
+            "HUMO" -> "💨 DETECTOR DE HUMO"
+            "AMBULANCIA" -> "🚑 AMBULANCIA"
+            else -> "⚠️ $soundType"
         }
         
         tvEmergencyType.text = "$displayType\n($confidence%)"
         emergencyOverlay.visibility = View.VISIBLE
         
+        // VIBRACIÓN AGRESIVA EN BUCLE (500ms vibrar, 100ms pausa, 500ms vibrar...)
         val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as android.os.Vibrator
+        val pattern = longArrayOf(0, 600, 150, 600, 150, 600)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            vibrator.vibrate(android.os.VibrationEffect.createWaveform(longArrayOf(0, 500, 200, 500), 0))
+            vibrator.vibrate(android.os.VibrationEffect.createWaveform(pattern, 0)) // El 0 significa repetir bucle
         } else {
-            vibrator.vibrate(longArrayOf(0, 500, 200, 500), 0)
+            vibrator.vibrate(pattern, 0)
         }
         
         startWarningBlink()
