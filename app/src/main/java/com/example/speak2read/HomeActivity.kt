@@ -358,14 +358,17 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
         btnSave.setOnClickListener {
             val name = tietName.text.toString().trim()
-            currentContact = if (name.isNotEmpty()) name else null
-            
-            val msg = if (currentContact != null) 
-                getString(R.string.contact_mode_speaking_with, currentContact) 
-            else 
-                getString(R.string.contact_mode_general)
-            
-            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+            if (name.isNotEmpty()) {
+                currentContact = name
+                tvHeaderTitle.text = "Chat con: $currentContact"
+                Toast.makeText(this, "Ahora hablando con: $currentContact", Toast.LENGTH_SHORT).show()
+                loadMessages() // Esto filtrará los mensajes de ese contacto
+            } else {
+                currentContact = null
+                tvHeaderTitle.text = "Speak2Read"
+                Toast.makeText(this, "Modo General (Sin contacto)", Toast.LENGTH_SHORT).show()
+                loadMessages()
+            }
             alertDialog.dismiss()
         }
         
@@ -379,6 +382,8 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private fun addMessage(text: String, type: MessageType) {
         val time = SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date())
         val category = Speak2ReadPrefs.getCurrentContext(this)
+        
+        // LOGICA IHC: Si estamos en modo filtro de contacto, guardamos con ese nombre
         val entity = ChatMessageEntity(
             userId = currentUserId,
             text = text,
@@ -388,6 +393,8 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             contactName = currentContact
         )
         val id = database.messageDao().insert(entity).toInt()
+        
+        // Solo mostramos en pantalla si no hay filtro o si el contacto coincide
         adapter.addMessage(ChatMessage(
             id = id,
             text = text,
@@ -400,7 +407,13 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     }
 
     private fun loadMessages() {
-        val savedMessages = database.messageDao().getAll(currentUserId)
+        val savedMessages = if (currentContact != null) {
+            database.messageDao().getMessagesByContact(currentUserId, currentContact!!)
+        } else {
+            // Modo general: mensajes que NO tienen contacto asignado
+            database.messageDao().getAll(currentUserId).filter { it.contactName == null }
+        }
+
         val chatMessages = savedMessages.map {
             ChatMessage(
                 id = it.id,
