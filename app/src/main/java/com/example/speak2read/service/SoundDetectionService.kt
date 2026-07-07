@@ -3,12 +3,15 @@ package com.example.speak2read.service
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import com.example.speak2read.HomeActivity
 import org.tensorflow.lite.task.audio.classifier.AudioClassifier
 import org.tensorflow.lite.support.audio.TensorAudio
 import java.util.concurrent.Executors
@@ -22,9 +25,11 @@ class SoundDetectionService : Service() {
         const val EXTRA_SOUND_TYPE = "extra_sound_type"
         const val EXTRA_CONFIDENCE = "extra_confidence"
         private const val CHANNEL_ID = "sound_detection_channel"
+        private const val EMERGENCY_CHANNEL_ID = "emergency_alerts_channel"
         private const val NOTIFICATION_ID = 1001
+        private const val EMERGENCY_NOTIFICATION_ID = 911
         private const val MODEL_FILE = "yamnet.tflite"
-        private const val PROBABILITY_THRESHOLD = 0.25f // Bajamos a 25% para que sea MUY sensible
+        private const val PROBABILITY_THRESHOLD = 0.30f 
     }
 
     private var audioClassifier: AudioClassifier? = null
@@ -34,10 +39,10 @@ class SoundDetectionService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        createNotificationChannels()
         try {
             audioClassifier = AudioClassifier.createFromFile(this, MODEL_FILE)
             audioRecord = audioClassifier?.createAudioRecord()
-            Log.d("S2R_Sound", "IA cargada y lista")
         } catch (e: Exception) {
             Log.e("S2R_Sound", "Error IA: ${e.message}")
         }
@@ -45,24 +50,41 @@ class SoundDetectionService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (!isRunning) {
-            startForegroundService()
+            startForeground(NOTIFICATION_ID, createPersistentNotification())
             startDetection()
             isRunning = true
         }
         return START_STICKY
     }
 
-    private fun startForegroundService() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(CHANNEL_ID, "Detección de Sonidos", NotificationManager.IMPORTANCE_LOW)
-            getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
-        }
-        val notification: Notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Escuchando Alertas")
-            .setContentText("Speak2Read te avisará si escucha alarmas.")
+    private fun createPersistentNotification(): Notification {
+        val intent = Intent(this, HomeActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+        
+        return NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("Oído Activo")
+            .setContentText("Speak2Read te cuida en segundo plano.")
             .setSmallIcon(android.R.drawable.ic_btn_speak_now)
+            .setOngoing(true)
+            .setContentIntent(pendingIntent)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
             .build()
-        startForeground(NOTIFICATION_ID, notification)
+    }
+
+    private fun createNotificationChannels() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val manager = getSystemService(NotificationManager::class.java)
+            
+            val channel = NotificationChannel(CHANNEL_ID, "Detección de Sonidos", NotificationManager.IMPORTANCE_LOW)
+            manager.createNotificationChannel(channel)
+            
+            val emergencyChannel = NotificationChannel(EMERGENCY_CHANNEL_ID, "Alertas de Emergencia", NotificationManager.IMPORTANCE_HIGH).apply {
+                description = "Alertas críticas de sirenas y alarmas"
+                enableVibration(true)
+                vibrationPattern = longArrayOf(0, 800, 200, 800)
+            }
+            manager.createNotificationChannel(emergencyChannel)
+        }
     }
 
     private fun startDetection() {
@@ -72,10 +94,9 @@ class SoundDetectionService : Service() {
         
         executor?.scheduleWithFixedDelay({
             try {
-                // Forma compatible con la version 0.4.4
+                // Forma compatible con la versión 0.4.4
                 val tensor = TensorAudio.create(audioClassifier!!.requiredTensorAudioFormat, audioClassifier!!.requiredInputBufferSize.toInt())
                 tensor.load(audioRecord)
-                
                 val results = audioClassifier?.classify(tensor)
                 
                 results?.firstOrNull()?.categories?.forEach { category ->
@@ -88,13 +109,11 @@ class SoundDetectionService : Service() {
                             label.contains("fire alarm") -> "INCENDIO"
                             label.contains("smoke detector") -> "HUMO"
                             label.contains("horn") -> "BOCINA"
-                            label.contains("emergency") -> "EMERGENCIA"
                             else -> null
                         }
                         
                         mappedType?.let {
-                            Log.d("S2R_Sound", "¡DETECTADO!: $it con $score")
-                            sendDetectionBroadcast(it, score)
+                            handleEmergency(it, score)
                         }
                     }
                 }
@@ -104,13 +123,65 @@ class SoundDetectionService : Service() {
         }, 0, 500, TimeUnit.MILLISECONDS)
     }
 
-    private fun sendDetectionBroadcast(soundType: String, confidence: Float) {
+    private fun handleEmergency(soundType: String, confidence: Float) {
+        Log.d("S2R_Sound", "¡ALERTA!: $soundType ($confidence)")
+        
+        // 1. Notificar a la actividad si esta abierta
         val intent = Intent(ACTION_SOUND_DETECTED).apply {
             putExtra(EXTRA_SOUND_TYPE, soundType)
             putExtra(EXTRA_CONFIDENCE, (confidence * 100).toInt())
             setPackage(packageName)
         }
         sendBroadcast(intent)
+
+        // 2. Vibrar desde el servicio (Funciona en segundo plano)
+        triggerVibration()
+
+        // 3. Mostrar notificacion de impacto
+        showEmergencyNotification(soundType)
+    }
+
+    private fun triggerVibration() {
+        val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val vibratorManager = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as android.os.VibratorManager
+            vibratorManager.defaultVibrator
+        } else {
+            @Suppress("DEPRECATION")
+            getSystemService(Context.VIBRATOR_SERVICE) as android.os.Vibrator
+        }
+        
+        val pattern = longArrayOf(0, 1000, 200, 1000, 200, 1000)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibrator.vibrate(android.os.VibrationEffect.createWaveform(pattern, -1))
+        } else {
+            @Suppress("DEPRECATION")
+            vibrator.vibrate(pattern, -1)
+        }
+    }
+
+    private fun showEmergencyNotification(soundType: String) {
+        val manager = getSystemService(NotificationManager::class.java)
+        val intent = Intent(this, HomeActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+
+        val notification = NotificationCompat.Builder(this, EMERGENCY_CHANNEL_ID)
+            .setContentTitle("🚨 ¡PELIGRO DETECTADO!")
+            .setContentText("Se escucha una $soundType cerca de ti.")
+            .setSmallIcon(android.R.drawable.ic_dialog_alert)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setAutoCancel(true)
+            .setContentIntent(pendingIntent)
+            .setFullScreenIntent(pendingIntent, true) 
+            .build()
+
+        try {
+            manager.notify(EMERGENCY_NOTIFICATION_ID, notification)
+        } catch (e: Exception) {
+            Log.e("S2R_Sound", "Error al mostrar notificacion: ${e.message}")
+        }
     }
 
     override fun onDestroy() {
