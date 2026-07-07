@@ -143,10 +143,6 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         btnSosHeader.setOnClickListener { showSosConfirmation() }
         updateQuickReplies(Speak2ReadPrefs.getCurrentContext(this))
 
-        findViewById<ImageButton>(R.id.btnSettings).setOnClickListener { 
-            val intent = Intent(this, SettingsActivity::class.java)
-            startActivity(intent)
-        }
         btnSelectContact.setOnClickListener { showContactDialog() }
 
         // Context Buttons

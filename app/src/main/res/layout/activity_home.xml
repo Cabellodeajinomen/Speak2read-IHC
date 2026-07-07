@@ -56,15 +56,6 @@
                 app:tint="@color/s2r_text_secondary"
                 android:layout_marginStart="8dp"
                 android:contentDescription="Contactos" />
-
-            <ImageButton
-                android:id="@+id/btnSettings"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@android:drawable/ic_menu_preferences"
-                app:tint="@color/s2r_text_secondary"
-                android:contentDescription="Ajustes" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
