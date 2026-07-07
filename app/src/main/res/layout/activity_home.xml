@@ -114,11 +114,12 @@
                 android:layout_weight="1"
                 android:background="@null"
                 android:gravity="top"
-                android:hint="Aquí aparecerá lo que la otra persona hable..."
+                android:hint="Toca el micro para hablar o escribe aquí..."
                 android:textColor="@color/s2r_text_primary"
                 android:textSize="20sp"
-                android:focusable="false"
-                android:inputType="none"
+                android:focusable="true"
+                android:enabled="true"
+                android:inputType="textMultiLine"
                 android:autofillHints="" />
 
             <LinearLayout
