@@ -36,7 +36,16 @@ class ContactAdapter(
         val item = items[position]
         holder.tvName.text = item.name
         holder.tvLastMsg.text = item.lastMessage
-        holder.btnPin.setImageResource(if (item.isPinned) android.R.drawable.btn_star_big_on else android.R.drawable.btn_star_big_off)
+        
+        if (item.isPinned) {
+            holder.btnPin.setImageResource(android.R.drawable.ic_menu_directions)
+            holder.btnPin.setColorFilter(androidx.core.content.ContextCompat.getColor(holder.itemView.context, R.color.s2r_bubble_usuario))
+            holder.btnPin.rotation = -45f // Rotación para efecto de pin clavado
+        } else {
+            holder.btnPin.setImageResource(android.R.drawable.ic_menu_directions)
+            holder.btnPin.setColorFilter(androidx.core.content.ContextCompat.getColor(holder.itemView.context, R.color.s2r_text_secondary))
+            holder.btnPin.rotation = 0f
+        }
         
         holder.itemView.setOnClickListener { onChatClick(item.name) }
         holder.btnPin.setOnClickListener { onPinClick(item.name, !item.isPinned) }

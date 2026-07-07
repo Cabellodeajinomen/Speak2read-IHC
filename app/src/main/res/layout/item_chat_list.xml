@@ -54,11 +54,12 @@
 
         <ImageButton
             android:id="@+id/btnPinChat"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/btn_star_big_off"
-            app:tint="@color/s2r_accent" />
+            android:src="@android:drawable/ic_menu_directions"
+            app:tint="@color/s2r_text_secondary"
+            android:contentDescription="Fijar chat" />
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

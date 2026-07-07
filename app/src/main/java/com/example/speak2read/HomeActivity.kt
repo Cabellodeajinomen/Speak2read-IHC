@@ -59,6 +59,8 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private lateinit var tvEmergencyType: TextView
     private lateinit var imgWarning: ImageView
     private lateinit var btnSosHeader: View
+    private lateinit var btnExitChat: ImageButton
+    private lateinit var ivHeaderLogo: ImageView
     private lateinit var tvHeaderTitle: TextView
     private lateinit var bottomNav: BottomNavigationView
 
@@ -116,6 +118,8 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         btnAcknowledge = findViewById(R.id.btnAcknowledge)
         imgWarning = findViewById(R.id.imgWarning)
         btnSosHeader = findViewById(R.id.btnSosHeader)
+        btnExitChat = findViewById(R.id.btnExitChat)
+        ivHeaderLogo = findViewById(R.id.ivHeaderLogo)
         tvHeaderTitle = findViewById(R.id.tvHeaderTitle)
         bottomNav = findViewById(R.id.bottom_navigation)
 
@@ -154,6 +158,15 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         updateQuickReplies(Speak2ReadPrefs.getCurrentContext(this))
 
         btnSelectContact.setOnClickListener { showContactDialog() }
+
+        btnExitChat.setOnClickListener {
+            currentContact = null
+            tvHeaderTitle.text = "Speak2Read"
+            btnExitChat.visibility = View.GONE
+            ivHeaderLogo.visibility = View.VISIBLE
+            loadMessages()
+            Toast.makeText(this, "Volviste al Chat General", Toast.LENGTH_SHORT).show()
+        }
 
         // Context Buttons
         findViewById<Button>(R.id.btnHospital).setOnClickListener { setAppContext("HOSPITAL") }
@@ -360,12 +373,16 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             val name = tietName.text.toString().trim()
             if (name.isNotEmpty()) {
                 currentContact = name
-                tvHeaderTitle.text = "Chat con: $currentContact"
+                tvHeaderTitle.text = "Chat: $currentContact"
+                btnExitChat.visibility = View.VISIBLE
+                ivHeaderLogo.visibility = View.GONE
                 Toast.makeText(this, "Ahora hablando con: $currentContact", Toast.LENGTH_SHORT).show()
-                loadMessages() // Esto filtrará los mensajes de ese contacto
+                loadMessages() 
             } else {
                 currentContact = null
                 tvHeaderTitle.text = "Speak2Read"
+                btnExitChat.visibility = View.GONE
+                ivHeaderLogo.visibility = View.VISIBLE
                 Toast.makeText(this, "Modo General (Sin contacto)", Toast.LENGTH_SHORT).show()
                 loadMessages()
             }
