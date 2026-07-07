@@ -14,7 +14,7 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_s2r_final"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_s2r_final"
+        android:roundIcon="@mipmap/ic_s2r_final_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Speak2Read">
         <service
