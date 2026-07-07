@@ -59,6 +59,7 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private lateinit var tvEmergencyType: TextView
     private lateinit var imgWarning: ImageView
     private lateinit var btnSosHeader: View
+    private lateinit var tvHeaderTitle: TextView
     private lateinit var bottomNav: BottomNavigationView
 
     private lateinit var database: Speak2ReadDatabase
@@ -115,6 +116,7 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         btnAcknowledge = findViewById(R.id.btnAcknowledge)
         imgWarning = findViewById(R.id.imgWarning)
         btnSosHeader = findViewById(R.id.btnSosHeader)
+        tvHeaderTitle = findViewById(R.id.tvHeaderTitle)
         bottomNav = findViewById(R.id.bottom_navigation)
 
         database = Room.databaseBuilder(applicationContext, Speak2ReadDatabase::class.java, "speak2read_db")
@@ -138,8 +140,8 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         val filterContact = intent.getStringExtra("FILTER_CONTACT")
         if (filterContact != null) {
             currentContact = filterContact
-            Toast.makeText(this, "Chat con: $currentContact", Toast.LENGTH_SHORT).show()
-            loadMessages() // Recargar con el filtro
+            tvHeaderTitle.text = "Chat: $currentContact"
+            loadMessages()
         }
 
         // Quick replies clicks
