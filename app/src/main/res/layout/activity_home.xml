@@ -20,7 +20,7 @@
             android:layout_height="match_parent"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:paddingHorizontal="16dp">
+            android:paddingHorizontal="8dp">
 
             <ImageButton
                 android:id="@+id/btnExitChat"
@@ -28,14 +28,15 @@
                 android:layout_height="48dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@android:drawable/ic_menu_revert"
-                app:tint="@color/s2r_text_secondary"
+                app:tint="@color/s2r_bubble_usuario"
                 android:visibility="gone"
-                android:contentDescription="Salir del chat" />
+                android:contentDescription="Volver al inicio" />
 
             <ImageView
                 android:id="@+id/ivHeaderLogo"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
+                android:layout_marginStart="8dp"
                 android:src="@drawable/logo_final_v5"
                 android:contentDescription="Logo" />
 

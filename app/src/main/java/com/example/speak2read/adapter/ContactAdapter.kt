@@ -38,11 +38,11 @@ class ContactAdapter(
         holder.tvLastMsg.text = item.lastMessage
         
         if (item.isPinned) {
-            holder.btnPin.setImageResource(android.R.drawable.ic_menu_directions)
+            holder.btnPin.setImageResource(R.drawable.ic_pin)
             holder.btnPin.setColorFilter(androidx.core.content.ContextCompat.getColor(holder.itemView.context, R.color.s2r_bubble_usuario))
-            holder.btnPin.rotation = -45f // Rotación para efecto de pin clavado
+            holder.btnPin.rotation = -45f 
         } else {
-            holder.btnPin.setImageResource(android.R.drawable.ic_menu_directions)
+            holder.btnPin.setImageResource(R.drawable.ic_pin)
             holder.btnPin.setColorFilter(androidx.core.content.ContextCompat.getColor(holder.itemView.context, R.color.s2r_text_secondary))
             holder.btnPin.rotation = 0f
         }
