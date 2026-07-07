@@ -57,17 +57,24 @@
         android:textColor="@color/s2r_text_primary"
         android:textColorHint="@color/s2r_text_secondary" />
 
-    <EditText
-        android:id="@+id/etPassword"
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:background="@drawable/bg_input_container"
-        android:hint="@string/login_password_hint"
-        android:inputType="textPassword"
-        android:paddingHorizontal="20dp"
-        android:textColor="@color/s2r_text_primary"
-        android:textColorHint="@color/s2r_text_secondary" />
+        app:passwordToggleEnabled="true"
+        app:hintEnabled="false">
+
+        <EditText
+            android:id="@+id/etPassword"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="@drawable/bg_input_container"
+            android:hint="@string/login_password_hint"
+            android:inputType="textPassword"
+            android:paddingHorizontal="20dp"
+            android:textColor="@color/s2r_text_primary"
+            android:textColorHint="@color/s2r_text_secondary" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnLogin"

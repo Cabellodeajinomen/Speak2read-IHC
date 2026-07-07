@@ -183,6 +183,10 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                 ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), REQUEST_RECORD_AUDIO)
                 return@setOnClickListener
             }
+            
+            // IHC: Pausar servicio de alarma para que no robe el microfono
+            stopSoundService()
+
             startMicPulse()
             val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
                 putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
@@ -292,6 +296,16 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         }
     }
 
+    private fun startSoundService() {
+        val intent = Intent(this, com.example.speak2read.service.SoundDetectionService::class.java)
+        startForegroundService(intent)
+    }
+
+    private fun stopSoundService() {
+        val intent = Intent(this, com.example.speak2read.service.SoundDetectionService::class.java)
+        stopService(intent)
+    }
+
     private fun setAppContext(ctx: String) {
         Speak2ReadPrefs.setCurrentContext(this, ctx)
         updateQuickReplies(ctx)
@@ -323,10 +337,21 @@ class HomeActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             override fun onBeginningOfSpeech() {}
             override fun onRmsChanged(rmsdB: Float) {}
             override fun onBufferReceived(buffer: ByteArray?) {}
-            override fun onEndOfSpeech() { stopMicPulse(); listening = false }
+            override fun onEndOfSpeech() { 
+                stopMicPulse()
+                listening = false 
+                // Reanudar alarma si estaba habilitada
+                if (Speak2ReadPrefs.isAlarmDetectionEnabled(this@HomeActivity)) {
+                    startSoundService()
+                }
+            }
             override fun onError(error: Int) {
                 stopMicPulse()
                 listening = false
+                // Reanudar alarma si estaba habilitada
+                if (Speak2ReadPrefs.isAlarmDetectionEnabled(this@HomeActivity)) {
+                    startSoundService()
+                }
                 val message = when (error) {
                     SpeechRecognizer.ERROR_NO_MATCH -> "No se escuchó nada claro, ¿puedes repetir?"
                     SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "No detecté sonido, intenta hablar más fuerte."

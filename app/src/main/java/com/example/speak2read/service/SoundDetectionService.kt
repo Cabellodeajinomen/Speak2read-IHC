@@ -24,7 +24,7 @@ class SoundDetectionService : Service() {
         private const val CHANNEL_ID = "sound_detection_channel"
         private const val NOTIFICATION_ID = 1001
         private const val MODEL_FILE = "yamnet.tflite"
-        private const val PROBABILITY_THRESHOLD = 0.30f 
+        private const val PROBABILITY_THRESHOLD = 0.25f // Bajamos a 25% para que sea MUY sensible
     }
 
     private var audioClassifier: AudioClassifier? = null
